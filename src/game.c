@@ -52,7 +52,7 @@ int main(int argc,char *argv[])
     //gf3d init
     gf3d_vgraphics_init("config/setup.cfg");
 
-    gf3d_mesh_init(1000);
+    
     
     gf2d_font_init("config/font.cfg");
     gf2d_actor_init(1000);

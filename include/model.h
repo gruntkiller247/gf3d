@@ -2,6 +2,7 @@
 #define __MODEL_H__
 #include "gf3d_pipeline.h"
 #include "gf3d_mesh.h"
+#include "simple_logger.h"
 
 typedef struct
 {
@@ -12,5 +13,16 @@ typedef struct
 
 
 }Model;
+
+typedef struct
+{
+    GFC_Matrix4     model;
+    GFC_Matrix4     view;
+    GFC_Matrix4     proj;
+    GFC_Vector4D    color;
+}MeshUBO;
+
+//IDK Some void function
+//void 
 
 #endif

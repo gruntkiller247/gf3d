@@ -1,17 +1,42 @@
 #include "simple_logger.h"
 #include "gf3d_mesh.h"
 
+#include "gf3d_buffers.h"
+#include "gf3d_swapchain.h"
+#include "gf3d_vgraphics.h"
+#include "gf3d_pipeline.h"
+#include "gf3d_commands.h"
+#include "gf2d_sprite.h"
+
 
 typedef struct
 {
     Uint32 meshCount;
     Mesh* meshList;
-    //vkDevice device;
+    VkDevice device;
+    Pipeline* pipe;             /**<the pipeline associated with sprite rendering*/
 }MeshManager;
 
 static MeshManager meshManager = {0};
 
 void gf3dMeshClose();
+
+Mesh* gf3d_mesh_get_by_filename(const char* fileName)
+{
+    if (!fileName)
+        return NULL;
+
+    for (int c = 0; c < meshManager.meshCount; c++)
+    {
+        if (strlen(meshManager.meshList[c].filename) == 0)
+            continue;
+
+        if (gfc_strlcmp(meshManager.meshList[c].filename,fileName))
+        {
+            //I AM MISSING STUFF HERE
+        }
+    }
+}
 
 void gf3d_mesh_init(Uint32 mesh_max)
 {
@@ -35,6 +60,15 @@ void gf3d_mesh_init(Uint32 mesh_max)
         return;
 
     meshManager.meshCount = mesh_max;
+
+    gf3d_mesh_get_attribute_descriptions(&count);
+    //pipe = ;
+    
+    //Copy and past the sprite's pipe init
+        //default logical device is meshManager's device
+        //use model_pipeline.cfg
+        //Need to create mesh_get_bind_description and attribute description
+
     atexit(gf3dMeshClose);
 }
 
@@ -45,7 +79,7 @@ void gf3dMeshClose()
 
     for (c = 0; c < meshManager.meshCount; c++)
     {
-        gf3d_mesh_free(&meshManager.meshList[c]);
+        gf3d_mesh_delete(&meshManager.meshList[c]);
     }
 
     free(meshManager.meshList);
@@ -63,9 +97,12 @@ Mesh* gf3d_mesh_new()
 
     for (c = 0; c < meshManager.meshCount; c++)
     {
-        if (meshManager.meshList[c]._refCount == 0)
+        if (meshManager.meshList[c]._refCount == 0 && (strlen(meshManager.meshList[c].filename) == 0))
         {
-            
+            if (strlen(meshManager.meshList[c].filename) > 0)
+            {
+                gf3d_mesh_delete(&meshManager.meshList[c]);
+            }
             meshManager.meshList[c].primitives = gfc_list_new();
 
             if (meshManager.meshList[c].primitives == NULL)
@@ -82,7 +119,7 @@ Mesh* gf3d_mesh_new()
 }
 
 
-void gf3d_mesh_free(Mesh* mesh)
+void gf3d_mesh_delete(Mesh* mesh)
 {
     if (!mesh)
        return;
@@ -97,8 +134,24 @@ void gf3d_mesh_free(Mesh* mesh)
         prim = gfc_list_nth(mesh->primitives, d);
         if (!prim)
             continue;
+        gf3d_mesh_primitive_free(prim);
 
     }
+    memset(mesh, 0, sizeOf(Mesh*)); //I THINK THIS IS WRONG!
+}
+
+void gf3d_mesh_free(Mesh* mesh)
+{
+    if (!mesh)
+        return;
+
+    mesh->_refCount--;
+
+    if(mesh->_refCount > 0)
+    {
+        return;
+    }
+    gf3d_mesh_delete(mesh);
 }
 
 void gf3dMeshPrimitiveFree(MeshPrimitive* prim)
@@ -106,36 +159,133 @@ void gf3dMeshPrimitiveFree(MeshPrimitive* prim)
     if (!prim)
         return;
 
-    //if (prim->buffer != VK_NULL_HANDLE)
+    if (prim->faceBuffer != VK_NULL_HANDLE)
     {
-        //FIX THIS KLAFPMPDKLGM
+        vkDestroyBUffer(meshManager.device, prim->vertexBuffer,NULL);
+    }
+    
+    //Not finished
+}
+
+int gf3d_mesh_buffer_create(Mesh* mesh)
+{
+    int i, c;
+    MeshPrimitive *prim;
+    if (!mesh)
+       return NULL;
+
+    for (i = 0; i < c; i++)
+    {
+        prim = gfc_list_nth(mesh->primitives, i);
+        if (!prim)
+            continue;
+        if(!)//I DO NOT KNOW
+            //Not finished
     }
 }
 
 
+int gf3d_prim_buffer_create(MeshPrimitive* prim)
+{
+    Uint32 bufferSize = 0;
+    vkBuffer stagingBuffer;
+    VKDeviceMemorey stagingBufferMemory;
+    if (!prim || !prim->objData)
+        return 0;
+
+    //FACE BUFFERS
+    bufferSize(sizeOf((Face) *prim->objData->faceCount);
+
+    //Something from Sprite then remade;
+    
+
+    //Vertex buffers
+    //I DO NOT KNOW WHAT HE COPPIED INTO HERE?
+
+    return 0;
+    //return 1;
+    //Not finished
+}
+
+int gf3d_mesh_primitive_buffer_create(MeshPrimitive* prim)
+{
+    //I Do not know
+    //Not finished
+}
+
+int mesh_obj_buffer()
+{
+    //I dont know
+    //Not finished
+}
+
+int gf3d_mesg_obj_buffer_create(Mesh* mesh)
+{
+    //Not finished
+    //I don't know
+}
+
+
 Mesh* gf3d_mesh_load_obj(const char* filename)
-{ }
+{ 
+    if (!filename)
+        return NULL;
+    int c;
 
-/**
- * @brief make an exact, but separate copy of the input mesh
- * @param in the mesh to duplicate
- * @return NULL on error, or a copy of in
- */
-Mesh* gf3d_mesh_copy(Mesh* in);
+    Mesh* mesh = gf3d_mesh_get_by_filename(filename);
+    
+    if (mesh)
+    {
+        mesh->_refCount++;
+        return mesh;
+    }
 
-/**
- * @brief move all of the vertices of the mesh by offset at the buffer level
- * @param in the mesh to move
- * @param offset how much to move it
- * @param rotation apply this rotation to the vertices and normals
- */
-void gf3d_mesh_move_vertices(Mesh* in, GFC_Vector3D offset, GFC_Vector3D rotation);
+    mesh = gf3d_mesh_new();
+
+    if (!mesh)
+    {
+        slog("Failed to allocate a new mesh. Return NULL!");
+        return NULL;
+    }
+
+    mesh->objData = gf3d_obj_load_from_file(filename);
+
+    if (!mesh->objData)
+    {
+        slog("Failed to allocate objData for mesh!");
+        gf3d_mesh_delete(mesh);
+        return NULL;
+    }
+
+    if (!gf3d_mesh_buffer_create(mesh))
+    {
+        slog("Failed to build memory buffers for meash %s", filename);
+        gf3d_mesh_delete(mesh);
+        return NULL;
+    }
+
+
+}
+
 
 /**
  * @brief allocate a zero initialized mesh primitive
  * @return NULL on error or the primitive
  */
-MeshPrimitive* gf3d_mesh_primitive_new();
+MeshPrimitive* gf3d_mesh_primitive_new()
+{
+    MeshPrimitive* prim;
+    prim = gfc_allocate_array(sizeOf(MeshPrimitive), 1);
+
+    if (!prim)
+    {
+        slog("Failed to allocate primitive memory for a mesh");
+        return NULL;
+    }
+    return prim;
+
+    //Finished, but error with MeshPrim?
+}
 
 
 /**
