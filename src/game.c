@@ -20,6 +20,8 @@
 #include "gf3d_pipeline.h"
 #include "gf3d_swapchain.h"
 
+#include "gf3d_mesh.h"
+
 extern int __DEBUG;
 
 static int _done = 0;
@@ -49,8 +51,13 @@ int main(int argc,char *argv[])
     gfc_action_init(1024);
     //gf3d init
     gf3d_vgraphics_init("config/setup.cfg");
+
+    gf3d_mesh_init(1000);
+    
     gf2d_font_init("config/font.cfg");
     gf2d_actor_init(1000);
+
+
     
     //game init
     srand(SDL_GetTicks());
@@ -60,10 +67,12 @@ int main(int argc,char *argv[])
     // main game loop    
     while(!_done)
     {
+        slog_sync();
+
         gfc_input_update();
         gf2d_mouse_update();
         gf2d_font_update();
-        //camera updaes
+        //camera updates
         gf3d_vgraphics_render_start();
                 //2D draws
                 gf2d_sprite_draw_image(bg,gfc_vector2d(0,0));

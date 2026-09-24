@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="CFG">
+      <UniqueIdentifier>{e68ad024-97b4-422b-9f6d-d236c59d4810}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{99d563d8-08b9-49c2-968b-cd14cbc8c6cc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\gf2d_actor.h">
@@ -174,6 +180,9 @@
     <ClInclude Include="..\gfc\simple_logger\include\simple_logger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\model.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\game.c">
@@ -326,5 +335,46 @@
     <ClCompile Include="..\gfc\simple_logger\src\simple_logger.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\model.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\gf3d_mesh.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\config\audio.cfg">
+      <Filter>CFG</Filter>
+    </None>
+    <None Include="..\config\font.cfg">
+      <Filter>CFG</Filter>
+    </None>
+    <None Include="..\config\input.cfg">
+      <Filter>CFG</Filter>
+    </None>
+    <None Include="..\config\overlay_pipeline.cfg">
+      <Filter>CFG</Filter>
+    </None>
+    <None Include="..\config\setup.cfg">
+      <Filter>CFG</Filter>
+    </None>
+    <None Include="..\config\sky_pipeline.cfg">
+      <Filter>CFG</Filter>
+    </None>
+    <None Include="..\shaders\sprite.frag">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\shaders\sprite.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="model_pipeline.cfg">
+      <Filter>CFG</Filter>
+    </None>
+    <None Include="..\shaders\model.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\shaders\model.frag">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>
