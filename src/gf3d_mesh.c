@@ -1,6 +1,7 @@
 #include "simple_logger.h"
 #include "gf3d_mesh.h"
 
+#include "gf3d_obj_load.h"
 #include "gf3d_buffers.h"
 #include "gf3d_swapchain.h"
 #include "gf3d_vgraphics.h"
@@ -8,6 +9,10 @@
 #include "gf3d_commands.h"
 #include "gf2d_sprite.h"
 
+typedef struct
+{
+    Uint16  verts[3];
+}Face;
 
 typedef struct
 {
@@ -41,6 +46,8 @@ Mesh* gf3d_mesh_get_by_filename(const char* fileName)
 
 void gf3d_mesh_init(Uint32 mesh_max)
 {
+    Face faces[2];
+
     if (meshManager.meshCount != 0)
     {
         slog("Cannot init mesh system, already initialized");
@@ -53,22 +60,13 @@ void gf3d_mesh_init(Uint32 mesh_max)
         return;
     }
 
-    meshManager.meshList = gfc_allocate_array(sizeof(Mesh),mesh_max);
-    meshManager.device = gf3d_vgraphics_get_default_logical_device;
-
-
+    meshManager.meshList = gfc_allocate_array(sizeof(Mesh), mesh_max);
+    
     if (!meshManager.meshList)
         return;
 
+    meshManager.device = gf3d_vgraphics_get_default_logical_device;
     meshManager.meshCount = mesh_max;
-
-    gf3d_mesh_get_attribute_descriptions(&meshCount);
-    //pipe = ;
-    
-    //Copy and past the sprite's pipe init
-        //default logical device is meshManager's device
-        //use model_pipeline.cfg
-        //Need to create mesh_get_bind_description and attribute description
 
     atexit(gf3dMeshClose);
 }
@@ -88,9 +86,6 @@ void gf3dMeshClose()
     memset(&meshManager,0,sizeof(MeshManager));
 
 }
-
-
-
 
 Mesh* gf3d_mesh_new()
 {
@@ -138,7 +133,7 @@ void gf3d_mesh_delete(Mesh* mesh)
         gf3d_mesh_primitive_free(prim);
 
     }
-    memset(mesh, 0, sizeOf(Mesh*)); //I THINK THIS IS WRONG!
+    memset(mesh, 0, sizeof(Mesh*));
 }
 
 void gf3d_mesh_free(Mesh* mesh)
@@ -162,10 +157,31 @@ void gf3dMeshPrimitiveFree(MeshPrimitive* prim)
 
     if (prim->faceBuffer != VK_NULL_HANDLE)
     {
-        vkDestroyBUffer(meshManager.device, prim->vertexBuffer,NULL);
+        vkDestroyBuffer(meshManager.device, prim->faceBuffer,NULL);
     }
-    
-    //Not finished
+
+    if (prim->faceBufferMemory != VK_NULL_HANDLE)
+    {
+        vkFreeMemory(meshManager.device,prim->faceBufferMemory,NULL);
+    }
+
+    if (prim->vertexBuffer != VK_NULL_HANDLE)
+    {
+        vkDestroyBuffer(meshManager.device,prim->vertexBuffer,NULL);
+    }
+
+    if (prim->vertexBufferMemory != VK_NULL_HANDLE)
+    {
+        vkFreeMemory(meshManager.device, prim->vertexBufferMemory,NULL);
+    }
+
+    if (prim->objData)
+    {
+        gf3d_obj_free(prim->objData);
+    }
+
+    //free(prim);
+    memset(prim, 0, sizeof(MeshPrimitive));
 }
 
 int gf3d_mesh_buffer_create(Mesh* mesh)
@@ -249,7 +265,7 @@ Mesh* gf3d_mesh_load_obj(const char* filename)
         return NULL;
     }
 
-    mesh->objData = gf3d_obj_load_from_file(filename);
+    mesh->prim->objData = gf3d_obj_load_from_file(filename);
 
     if (!mesh->objData)
     {
