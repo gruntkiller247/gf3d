@@ -21,6 +21,7 @@ static MeshManager meshManager = {0};
 
 void gf3dMeshClose();
 
+//I think this is correct!
 Mesh* gf3d_mesh_get_by_filename(const char* fileName)
 {
     if (!fileName)
@@ -33,7 +34,7 @@ Mesh* gf3d_mesh_get_by_filename(const char* fileName)
 
         if (gfc_strlcmp(meshManager.meshList[c].filename,fileName))
         {
-            //I AM MISSING STUFF HERE
+            return &meshManager.meshList[c];
         }
     }
 }
@@ -53,15 +54,15 @@ void gf3d_mesh_init(Uint32 mesh_max)
     }
 
     meshManager.meshList = gfc_allocate_array(sizeof(Mesh),mesh_max);
+    meshManager.device = gf3d_vgraphics_get_default_logical_device;
 
-    //meshManager.device = gf3d  FIX THIS IJANFONASOKGNNAOPSF
 
     if (!meshManager.meshList)
         return;
 
     meshManager.meshCount = mesh_max;
 
-    gf3d_mesh_get_attribute_descriptions(&count);
+    gf3d_mesh_get_attribute_descriptions(&meshCount);
     //pipe = ;
     
     //Copy and past the sprite's pipe init
