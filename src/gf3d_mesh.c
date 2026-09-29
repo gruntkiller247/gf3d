@@ -1,6 +1,6 @@
 #include "simple_logger.h"
 #include "gf3d_mesh.h"
-
+#include "model.h"
 #include "gf3d_obj_load.h"
 #include "gf3d_buffers.h"
 #include "gf3d_swapchain.h"
@@ -19,7 +19,7 @@ typedef struct
     Uint32 meshCount;
     Mesh* meshList;
     VkDevice device;
-    Pipeline* pipe;             /**<the pipeline associated with sprite rendering*/
+    //Pipeline* pipe;             /**<the pipeline associated with sprite rendering*/
 }MeshManager;
 
 static MeshManager meshManager = {0};
@@ -67,6 +67,13 @@ void gf3d_mesh_init(Uint32 mesh_max)
 
     meshManager.device = gf3d_vgraphics_get_default_logical_device;
     meshManager.meshCount = mesh_max;
+
+    if (!model->pipe)
+    {
+        slog("Failed to make pipeline for models");
+        model_close();
+        return;
+    }
 
     atexit(gf3dMeshClose);
 }
@@ -228,7 +235,10 @@ int gf3d_mesh_primitive_buffer_create(MeshPrimitive* prim)
 {
     //I Do not know
     //Not finished
+    prim->vertexCount = prim->objData->face_vert_count;
+    prim->faceCount = prim;//IDK;
 }
+
 
 int mesh_obj_buffer()
 {
@@ -241,6 +251,8 @@ int gf3d_mesg_obj_buffer_create(Mesh* mesh)
     //Not finished
     //I don't know
 }
+
+
 
 
 Mesh* gf3d_mesh_load_obj(const char* filename)
@@ -264,8 +276,8 @@ Mesh* gf3d_mesh_load_obj(const char* filename)
         slog("Failed to allocate a new mesh. Return NULL!");
         return NULL;
     }
-
-    mesh->prim->objData = gf3d_obj_load_from_file(filename);
+    
+    mesh->objData = gf3d_obj_load_from_file(filename);
 
     if (!mesh->objData)
     {
@@ -281,7 +293,7 @@ Mesh* gf3d_mesh_load_obj(const char* filename)
         return NULL;
     }
 
-
+    gfc_line_cpy(mesh->filename, filename);
 }
 
 
@@ -343,7 +355,25 @@ VkCommandBuffer gf3d_mesh_get_model_command_buffer();
  * @param uboData the data to use to draw the mesh
  * @param texture texture data to use
  */
-void gf3d_mesh_queue_render(Mesh* mesh, Pipeline* pipe, void* uboData, Texture* texture);
+void gf3d_mesh_queue_render(Mesh* mesh, Pipeline* pipe, void* uboData, Texture* texture)
+{
+    if (!mesh || !pipe || !uboData || !texture)
+        return;
+    int c, i;
+    MeshPrimitive *prim;
+
+    c = gfc_list_count(mesh->primitives);
+
+    for (i = 0; i < c; i++)
+    {
+        prim = gfc_list_nth(mesh->primitives);
+        if (!prim)
+            continue;
+        gf3d_pipeline_queue_render(pipe,prim->vertexBuffer,prim->vertexCount,prim->faceBuffer,uboData,texture)
+            ;
+    }
+    
+}
 
 
 /**

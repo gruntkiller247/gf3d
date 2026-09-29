@@ -9,8 +9,8 @@ typedef struct
 	int					_refCount;	//How many entities exist that want to draw this
 	Texture*			texture;	//Texture memory pointer
 	Mesh				*mesh;		//GPU handles for mesh data
-	VkDescriptorSet*	descriptorSet; //
-
+	//VkDescriptorSet*	descriptorSet; //
+	GFC_TextLine	fileName;
 
 }Model;
 
@@ -21,6 +21,8 @@ typedef struct
     GFC_Matrix4     proj;
     GFC_Vector4D    color;
 }MeshUBO;
+
+Model* model_load(const char* filename);
 
 //IDK Some void function
 //void 

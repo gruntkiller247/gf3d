@@ -2,6 +2,8 @@
  * @purpose vulkan graphics setup and abstraction
 */
 
+//renderPipe = model_get_pipeline(); //IDK
+
 #include <SDL.h>
 #include <SDL_vulkan.h>
 #include <vulkan/vulkan.h>
