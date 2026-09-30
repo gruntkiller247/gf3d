@@ -47,6 +47,8 @@ Mesh* gf3d_mesh_get_by_filename(const char* fileName)
             return &meshManager.meshList[c];
         }
     }
+
+    return NULL;
 }
 
 void gf3d_mesh_init(Uint32 mesh_max)
@@ -274,11 +276,15 @@ int gf3d_mesg_obj_buffer_create(Mesh* mesh)
 
 Mesh* gf3d_mesh_load_obj(const char* filename)
 { 
+    Mesh* mesh;
+    MeshPrimitive *prim;
+    ObjData *data;
+
     if (!filename)
         return NULL;
-    int c;
 
-    Mesh* mesh = gf3d_mesh_get_by_filename(filename);
+
+    mesh = gf3d_mesh_get_by_filename(filename);
     
     if (mesh)
     {
@@ -293,23 +299,40 @@ Mesh* gf3d_mesh_load_obj(const char* filename)
         slog("Failed to allocate a new mesh. Return NULL!");
         return NULL;
     }
-    
-    mesh->objData = gf3d_obj_load_from_file(filename);
 
-    if (!mesh->objData)
+    prim = gf3d_mesh_primitive_new();
+
+    if (!prim)
     {
-        slog("Failed to allocate objData for mesh!");
+        slog("Failed to load mesh primitive! For filename: %f", filename);
+        gf3d_mesh_free(mesh);
+        return NULL;
+    }
+    mesh->primitives = gfc_list_new();
+    gfc_list_append(mesh->primitives, prim);
+
+    data = gf3d_obj_load_from_file(filename);
+    if (!data)
+    {
         gf3d_mesh_delete(mesh);
+        gf3d_mesh_primitive_free(prim);
+        slog("Failed to allocate objData for mesh!");
         return NULL;
     }
 
+    prim->objData = data;
+    
+    //Last spot working
+
+    
+    /*
     if (!gf3d_mesh_buffer_create(mesh))
     {
         slog("Failed to build memory buffers for meash %s", filename);
         gf3d_mesh_delete(mesh);
         return NULL;
     }
-
+    */
     gfc_line_cpy(mesh->filename, filename);
 }
 
