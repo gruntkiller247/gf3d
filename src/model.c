@@ -26,6 +26,8 @@ void model_init_system(Uint32 modelCount)
 	//Pipeline made here?
 	//Stolen from sprite?
 
+	//Add a flag read on json that checks if the model should be kept as a model used often such as a player model or grenade
+
 	//Steal the mesh creation code and replace here
 
 	model_manager.defaultTexture = gf3d_texture_load("images/default.png");
@@ -49,6 +51,11 @@ void model_free(Model* model)
 		return;
 
 	model->_refCount--;
+
+	if (!model->_refCount == 0)
+	{
+		model_delete(model);
+	}
 }
 
 void model_delete(Model* model)
@@ -76,6 +83,7 @@ Model* modelNew()
 
 void model_close()
 {
+	slog("DID NOT WRITE MODEL_CLOSE!");
 	return;
 }
 

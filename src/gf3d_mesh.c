@@ -20,11 +20,16 @@ typedef struct
     Mesh* meshList;
     VkDevice device;
     //Pipeline* pipe;             /**<the pipeline associated with sprite rendering*/
+    //VkBuffer faceBuffer;
+    //VkDeviceMemory faceBuffMem;
+    //VkVertexInputAttributeDescription attributeDescriptions[3];
+    //VkVertexInputBindingDescription bindingDescription;
+    Uint32 chainLength;
 }MeshManager;
 
 static MeshManager meshManager = {0};
 
-void gf3dMeshClose();
+void gf3d_mesh_close();
 
 //I think this is correct!
 Mesh* gf3d_mesh_get_by_filename(const char* fileName)
@@ -46,8 +51,6 @@ Mesh* gf3d_mesh_get_by_filename(const char* fileName)
 
 void gf3d_mesh_init(Uint32 mesh_max)
 {
-    Face faces[2];
-
     if (meshManager.meshCount != 0)
     {
         slog("Cannot init mesh system, already initialized");
@@ -60,25 +63,28 @@ void gf3d_mesh_init(Uint32 mesh_max)
         return;
     }
 
-    meshManager.meshList = gfc_allocate_array(sizeof(Mesh), mesh_max);
+    meshManager.meshList = (Mesh*)gfc_allocate_array(sizeof(Mesh), mesh_max);
+    
     
     if (!meshManager.meshList)
         return;
 
+    meshManager.chainLength = gf3d_swapchain_get_chain_length();
     meshManager.device = gf3d_vgraphics_get_default_logical_device;
     meshManager.meshCount = mesh_max;
 
+    /*
     if (!model->pipe)
     {
         slog("Failed to make pipeline for models");
         model_close();
         return;
-    }
+    }*/
 
-    atexit(gf3dMeshClose);
+    atexit(gf3d_mesh_close);
 }
 
-void gf3dMeshClose()
+void gf3d_mesh_close()
 {
     int c;
     //go through list of meshes and free them all!
@@ -102,10 +108,7 @@ Mesh* gf3d_mesh_new()
     {
         if (meshManager.meshList[c]._refCount == 0 && (strlen(meshManager.meshList[c].filename) == 0))
         {
-            if (strlen(meshManager.meshList[c].filename) > 0)
-            {
-                gf3d_mesh_delete(&meshManager.meshList[c]);
-            }
+
             meshManager.meshList[c].primitives = gfc_list_new();
 
             if (meshManager.meshList[c].primitives == NULL)
@@ -117,10 +120,15 @@ Mesh* gf3d_mesh_new()
 
             return &meshManager.meshList[c];
         }
+
+        if (strlen(meshManager.meshList[c].filename) > 0)
+        {
+            gf3d_mesh_delete(&meshManager.meshList[c]);
+        }
+        
     }
     return NULL;
 }
-
 
 void gf3d_mesh_delete(Mesh* mesh)
 {
@@ -140,6 +148,11 @@ void gf3d_mesh_delete(Mesh* mesh)
         gf3d_mesh_primitive_free(prim);
 
     }
+
+    if (mesh->primitives)
+    {
+        gfc_list_delete(mesh->primitives);
+    }
     memset(mesh, 0, sizeof(Mesh*));
 }
 
@@ -157,7 +170,7 @@ void gf3d_mesh_free(Mesh* mesh)
     gf3d_mesh_delete(mesh);
 }
 
-void gf3dMeshPrimitiveFree(MeshPrimitive* prim)
+void gf3d_mesh_primitive_free(MeshPrimitive* prim)
 {
     if (!prim)
         return;
@@ -191,9 +204,11 @@ void gf3dMeshPrimitiveFree(MeshPrimitive* prim)
     memset(prim, 0, sizeof(MeshPrimitive));
 }
 
+/*
 int gf3d_mesh_buffer_create(Mesh* mesh)
 {
     int i, c;
+    c = gfc_list_count();
     MeshPrimitive *prim;
     if (!mesh)
        return NULL;
@@ -207,18 +222,20 @@ int gf3d_mesh_buffer_create(Mesh* mesh)
             //Not finished
     }
 }
+*/
+
 
 
 int gf3d_prim_buffer_create(MeshPrimitive* prim)
 {
     Uint32 bufferSize = 0;
-    vkBuffer stagingBuffer;
-    VKDeviceMemorey stagingBufferMemory;
+    VkBuffer stagingBuffer;
+    VkDeviceMemory stagingBufferMemory;
     if (!prim || !prim->objData)
         return 0;
 
     //FACE BUFFERS
-    bufferSize(sizeOf((Face) *prim->objData->faceCount);
+    bufferSize = (sizeof(prim->objData->face_count));
 
     //Something from Sprite then remade;
     
@@ -304,7 +321,7 @@ Mesh* gf3d_mesh_load_obj(const char* filename)
 MeshPrimitive* gf3d_mesh_primitive_new()
 {
     MeshPrimitive* prim;
-    prim = gfc_allocate_array(sizeOf(MeshPrimitive), 1);
+    prim = gfc_allocate_array(sizeof(MeshPrimitive), 1);
 
     if (!prim)
     {
@@ -313,7 +330,7 @@ MeshPrimitive* gf3d_mesh_primitive_new()
     }
     return prim;
 
-    //Finished, but error with MeshPrim?
+    //Finished, 
 }
 
 
