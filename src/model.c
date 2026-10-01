@@ -6,6 +6,7 @@
 #include "gf3d_commands.h"
 #include "gf2d_sprite.h"
 #include "simple_logger.h"
+#include "gf3d_mesh.h"
 
 typedef struct
 {
@@ -25,10 +26,13 @@ void model_init_system(Uint32 modelCount)
 {
 	//Pipeline made here?
 	//Stolen from sprite?
-
+	//NEED TO DO
 	//Add a flag read on json that checks if the model should be kept as a model used often such as a player model or grenade
 
 	//Steal the mesh creation code and replace here
+
+	//Need to 
+	gf3d_mesh_init(1024);
 
 	model_manager.defaultTexture = gf3d_texture_load("images/default.png");
 
@@ -39,6 +43,7 @@ void model_init_system(Uint32 modelCount)
 	}
 }
 
+//functions to make
 //model_free
 //movel_render
 //model render generic
@@ -212,9 +217,9 @@ void gf3d_model_queue_render(Model* model,GFC_Matrix4 mat,GFC_Color colormod)
 {
 	if (!model)
 		return;
-
-	UboData ubo = model_get_ubo(mat, colorMod);
-	gf3d_mesh_queue_render(model->mesh,model_manager.pipe,void* uboData,model->texture);
+	
+	ModelUBO ubo = model_get_ubo(mat, colormod);
+	gf3d_mesh_queue_render(model->mesh,model_manager.pipe,&ubo ,model->texture); //IDK
 	//gf3d_pipeline_queue_render(model_manager.pipe,mesh);
 }
 
@@ -225,3 +230,22 @@ void gf3d_mesh_reset_pipes()
 	
 }
 */
+
+void model_queue_render(Model* model, GFC_Matrix4 mat,GFC_Color color)
+{
+	//IDK
+}
+
+void gf3d_mesh_primitive_queue_render(MeshPrimitive* prim, Pipeline* pipe, void* uboData, Texture* texture)
+{
+	if ((!prim) || (!pipe) || (!uboData)) 
+		return;
+
+	if (!texture)
+	{
+		texture = model_manager.defaultTexture;
+	}
+		
+	
+	gf3d_pipeline_queue_render(pipe, prim->vertexBuffer, prim->vertexCount, prim->faceBuffer, uboData, texture);
+}

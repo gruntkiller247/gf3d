@@ -13,18 +13,15 @@ typedef struct
 {
     Uint16  verts[3];
 }Face;
+MESH_ATTRIBUTE_COUNT = 3;
 
 typedef struct
 {
     Uint32 meshCount;
     Mesh* meshList;
     VkDevice device;
-    //Pipeline* pipe;             /**<the pipeline associated with sprite rendering*/
-    //VkBuffer faceBuffer;
-    //VkDeviceMemory faceBuffMem;
-    //VkVertexInputAttributeDescription attributeDescriptions[3];
-    //VkVertexInputBindingDescription bindingDescription;
-    Uint32 chainLength;
+    VkVertexInputAttributeDescription attributeDescriptions[3];
+    VkVertexInputBindingDescription bindingDescription;
 }MeshManager;
 
 static MeshManager meshManager = {0};
@@ -51,6 +48,7 @@ Mesh* gf3d_mesh_get_by_filename(const char* fileName)
     return NULL;
 }
 
+//I think this is correct
 void gf3d_mesh_init(Uint32 mesh_max)
 {
     if (meshManager.meshCount != 0)
@@ -71,9 +69,11 @@ void gf3d_mesh_init(Uint32 mesh_max)
     if (!meshManager.meshList)
         return;
 
-    meshManager.chainLength = gf3d_swapchain_get_chain_length();
+    //meshManager.chainLength = gf3d_swapchain_get_chain_length();
     meshManager.device = gf3d_vgraphics_get_default_logical_device;
     meshManager.meshCount = mesh_max;
+
+    
 
     /*
     if (!model->pipe)
@@ -86,6 +86,7 @@ void gf3d_mesh_init(Uint32 mesh_max)
     atexit(gf3d_mesh_close);
 }
 
+//I think this is correct
 void gf3d_mesh_close()
 {
     int c;
@@ -102,6 +103,7 @@ void gf3d_mesh_close()
 
 }
 
+//I think this is correct
 Mesh* gf3d_mesh_new()
 {
     int c;
@@ -226,8 +228,6 @@ int gf3d_mesh_buffer_create(Mesh* mesh)
 }
 */
 
-
-
 int gf3d_prim_buffer_create(MeshPrimitive* prim)
 {
     Uint32 bufferSize = 0;
@@ -258,7 +258,6 @@ int gf3d_mesh_primitive_buffer_create(MeshPrimitive* prim)
     prim->faceCount = prim;//IDK;
 }
 
-
 int mesh_obj_buffer()
 {
     //I dont know
@@ -270,9 +269,6 @@ int gf3d_mesg_obj_buffer_create(Mesh* mesh)
     //Not finished
     //I don't know
 }
-
-
-
 
 Mesh* gf3d_mesh_load_obj(const char* filename)
 { 
@@ -324,6 +320,22 @@ Mesh* gf3d_mesh_load_obj(const char* filename)
     
     //Last spot working
 
+    //Need to fill prim?
+
+    prim->vertexCount = 3;
+    gf3d_mesh_primitive_create_vertex_buffer(prim);
+    gf3d_mesh_primitive_create_face_buffer(prim);
+
+    /*
+    Uint32          vertexCount;
+    VkBuffer        vertexBuffer;
+    VkDeviceMemory  vertexBufferMemory;
+    Uint32          faceCount;
+    VkBuffer        faceBuffer;
+    VkDeviceMemory  faceBufferMemory;
+    ObjData* objData;
+    */
+
     
     /*
     if (!gf3d_mesh_buffer_create(mesh))
@@ -337,10 +349,7 @@ Mesh* gf3d_mesh_load_obj(const char* filename)
 }
 
 
-/**
- * @brief allocate a zero initialized mesh primitive
- * @return NULL on error or the primitive
- */
+
 MeshPrimitive* gf3d_mesh_primitive_new()
 {
     MeshPrimitive* prim;
@@ -351,50 +360,50 @@ MeshPrimitive* gf3d_mesh_primitive_new()
         slog("Failed to allocate primitive memory for a mesh");
         return NULL;
     }
+
     return prim;
 
     //Finished, 
 }
 
+VkVertexInputAttributeDescription* gf3d_mesh_get_attribute_descriptions(Uint32* count)
+{
+    //IDK
+    //Given to model?
+    if (count)
+    {
+        *count = MESH_ATTRIBUTE_COUNT;//3 IDK?
+    }
 
-/**
- * @brief get the input attribute descriptions for mesh based rendering
- * @param count (optional, output) the number of attributes
- * @return a pointer to a vertex input attribute description array
- */
-VkVertexInputAttributeDescription* gf3d_mesh_get_attribute_descriptions(Uint32* count);
+    meshManager.attributeDescriptions[0].binding = 0;
+    meshManager.attributeDescriptions[0].location = 0;
+    meshManager.attributeDescriptions[0].format = VK_FORMAT_R32G32B32_SFLOAT;
+    meshManager.attributeDescriptions[0].offset = offsetof(Vertex, vertex);
 
-/**
- * @brief get the binding description for mesh based rendering
- * @return vertex input binding descriptions compatible with mesh data
- */
-VkVertexInputBindingDescription* gf3d_mesh_get_bind_description();
+    meshManager.attributeDescriptions[1].binding = 0;
+    meshManager.attributeDescriptions[1].location = 1;
+    meshManager.attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
+    meshManager.attributeDescriptions[1].offset = offsetof(Vertex, normal);
 
-
-
-/**
- * @brief needs to be called once at the beginning of each render frame
- */
-void gf3d_mesh_reset_pipes();
-
-/**
- * @brief called to submit all draw commands to the mesh pipelines
- */
-void gf3d_mesh_submit_pipe_commands();
-
-/**
- * @brief get the current command buffer for the mesh system
- */
-VkCommandBuffer gf3d_mesh_get_model_command_buffer();
+    meshManager.attributeDescriptions[2].binding = 0;
+    meshManager.attributeDescriptions[2].location = 2;
+    meshManager.attributeDescriptions[2].format = VK_FORMAT_R32G32_SFLOAT;
+    meshManager.attributeDescriptions[2].offset = offsetof(Vertex, texel);
 
 
-/**
- * @brief queue up a render for the current draw frame
- * @param mesh the mesh to render
- * @param pipe the pipeline to use
- * @param uboData the data to use to draw the mesh
- * @param texture texture data to use
- */
+    return meshManager.attributeDescriptions;
+}
+
+VkVertexInputBindingDescription* gf3d_mesh_get_bind_description()
+{
+    meshManager.bindingDescription.binding = 0;
+    meshManager.bindingDescription.stride = sizeof(Vertex);
+    meshManager.bindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+
+    return &meshManager.bindingDescription;
+}
+
+//Finished?
 void gf3d_mesh_queue_render(Mesh* mesh, Pipeline* pipe, void* uboData, Texture* texture)
 {
     if (!mesh || !pipe || !uboData || !texture)
@@ -406,47 +415,101 @@ void gf3d_mesh_queue_render(Mesh* mesh, Pipeline* pipe, void* uboData, Texture* 
 
     for (i = 0; i < c; i++)
     {
-        prim = gfc_list_nth(mesh->primitives);
+        prim = gfc_list_nth(mesh->primitives,i);
         if (!prim)
             continue;
-        gf3d_pipeline_queue_render(pipe,prim->vertexBuffer,prim->vertexCount,prim->faceBuffer,uboData,texture)
-            ;
+        gf3d_pipeline_queue_render(pipe,prim->vertexBuffer,prim->vertexCount,prim->faceBuffer,uboData,texture);
     }
     
 }
-
-
-/**
- * @brief adds a mesh to the render pass rendered as an outline highlight
- * @note: must be called within the render pass
- * @param mesh the mesh to render
- * @param com the command pool to use to handle the request we are rendering with
- */
-void gf3d_mesh_render(Mesh* mesh, VkCommandBuffer commandBuffer, VkDescriptorSet* descriptorSet);
-
-/**
- * @brief render a mesh through a given pipeline
- */
-void gf3d_mesh_render_generic(Mesh* mesh, Pipeline* pipe, VkDescriptorSet* descriptorSet);
-
-/**
- * @brief create a mesh's internal buffers based on vertices
- * @param primitive the mesh primitive to populate
- * @note the primitive must have the objData set and it must have be organizes in buffer order
- */
-void gf3d_mesh_create_vertex_buffer_from_vertices(MeshPrimitive* primitive);
-
-/**
- * @brief get the pipeline that is used to render basic 3d meshes
- * @return NULL on error or the pipeline in question
- */
-Pipeline* gf3d_mesh_get_pipeline();
 
 /**
  * @brief given a model matrix and basic color, build the meshUBO needed to render a model
  * @param modelMat the model Matrix
  * @param colorMod the color for the UBO
  */
-MeshUBO gf3d_mesh_get_ubo(
-    GFC_Matrix4 modelMat,
-    GFC_Color colorMod);
+MeshUBO gf3d_mesh_get_ubo(GFC_Matrix4 modelMat, GFC_Color colorMod)
+{
+    //IDK WHAT THIS IS FOR?
+
+    
+}
+
+
+
+
+
+void gf3d_mesh_primitive_create_vertex_buffer(MeshPrimitive* prim)
+{
+    void* data = NULL;
+    VkDevice device = gf3d_vgraphics_get_default_logical_device();
+    Face* faces;
+    Uint32 fcount;
+    size_t bufferSize;
+    VkBuffer stagingBuffer;
+    VkDeviceMemory stagingBufferMemory = VK_NULL_HANDLE;
+
+    if (!prim)
+    {
+        slog("No mesh primitize provided");
+        return;
+    }
+
+    faces = prim->objData->outFace;
+    fcount = prim->objData->face_count;
+    bufferSize = sizeof(Face) * fcount;
+    gf3d_buffer_create(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
+        VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &stagingBuffer, &stagingBufferMemory);
+
+    vkMapMemory(device, stagingBufferMemory, 0, bufferSize, 0, &data);
+    memcpy(data, faces, (size_t)bufferSize);
+    vkUnmapMemory(device, stagingBufferMemory);
+
+    gf3d_buffer_create(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+        VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &prim->faceBuffer, &prim->faceBufferMemory);
+
+    gf3d_buffer_copy(stagingBuffer, prim->faceBuffer, bufferSize);
+
+    prim->faceCount = fcount;
+
+    vkDestroyBuffer(device, stagingBuffer, NULL);
+    vkFreeMemory(device, stagingBufferMemory, NULL);
+}
+
+void gf3d_mesh_primitive_create_face_buffer(MeshPrimitive* prim)
+{
+    void* data = NULL;
+    VkDevice device = gf3d_vgraphics_get_default_logical_device();
+    Face* faces;
+    Uint32 fcount;
+    size_t bufferSize;
+    VkBuffer stagingBuffer;
+    VkDeviceMemory stagingBufferMemory = VK_NULL_HANDLE;
+
+    if (!prim)
+    {
+        slog("No mesh primitize provided");
+        return;
+    }
+
+    faces = prim->objData->outFace;
+    fcount = prim->objData->face_count;
+    bufferSize = sizeof(Face) * fcount;
+    gf3d_buffer_create(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
+        VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &stagingBuffer, &stagingBufferMemory);
+
+    vkMapMemory(device, stagingBufferMemory, 0, bufferSize, 0, &data);
+    memcpy(data, faces, (size_t)bufferSize);
+    vkUnmapMemory(device, stagingBufferMemory);
+
+    gf3d_buffer_create(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+        VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &prim->faceBuffer, &prim->faceBufferMemory);
+
+    gf3d_buffer_copy(stagingBuffer, prim->faceBuffer, bufferSize);
+
+    prim->faceCount = fcount;
+
+    vkDestroyBuffer(device, stagingBuffer, NULL);
+    vkFreeMemory(device, stagingBufferMemory, NULL);
+
+}

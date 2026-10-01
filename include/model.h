@@ -20,11 +20,19 @@ typedef struct
     GFC_Matrix4     view;
     GFC_Matrix4     proj;
     GFC_Vector4D    color;
-}MeshUBO;
+}ModelUBO;
 
 Model* model_load(const char* filename);
 
 //IDK Some void function
 //void 
+
+void model_init_system(Uint32 modelCount);
+
+Pipeline* model_get_pipeline();
+
+void model_free(Model* model);
+
+void model_queue_render(Model* model, GFC_Matrix4 mat, GFC_Color colormod);
 
 #endif
