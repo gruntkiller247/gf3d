@@ -64,6 +64,7 @@ int main(int argc,char *argv[])
     //void gfc_matrix4_view(*view, gfc_vector3d(0, -10.0, 0), gfc_vecto3d(0, 0, 0), gfc_vector3d(0, 0, 1)); IDK
     //gfc matrix4 identity(mat);
     //game init
+    
 
     srand(SDL_GetTicks());
     slog_sync();

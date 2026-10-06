@@ -9,24 +9,24 @@
 #include "gf3d_commands.h"
 #include "gf2d_sprite.h"
 
-typedef struct
-{
-    Uint16  verts[3];
-}Face;
-MESH_ATTRIBUTE_COUNT = 3;
+
+#define MESH_ATTRIBUTE_COUNT 3
 
 typedef struct
 {
     Uint32 meshCount;
     Mesh* meshList;
     VkDevice device;
-    VkVertexInputAttributeDescription attributeDescriptions[3];
+    VkVertexInputAttributeDescription attributeDescriptions[MESH_ATTRIBUTE_COUNT];
     VkVertexInputBindingDescription bindingDescription;
 }MeshManager;
 
 static MeshManager meshManager = {0};
 
 void gf3d_mesh_close();
+void gf3d_mesh_delete(Mesh* mesh);
+void gf3d_mesh_primitive_free(MeshPrimitive* prim);
+Mesh* gf3d_mesh_get_by_filename(const char* fileName);
 
 //I think this is correct!
 Mesh* gf3d_mesh_get_by_filename(const char* fileName)
@@ -36,7 +36,7 @@ Mesh* gf3d_mesh_get_by_filename(const char* fileName)
 
     for (int c = 0; c < meshManager.meshCount; c++)
     {
-        if (strlen(meshManager.meshList[c].filename) == 0)
+        if (strlen(meshManager.meshList[c].filename) == 0 || meshManager.meshList[c]._refCount == 0)
             continue;
 
         if (gfc_strlcmp(meshManager.meshList[c].filename,fileName))
@@ -86,7 +86,7 @@ void gf3d_mesh_init(Uint32 mesh_max)
     atexit(gf3d_mesh_close);
 }
 
-//I think this is correct
+
 void gf3d_mesh_close()
 {
     int c;
@@ -103,33 +103,64 @@ void gf3d_mesh_close()
 
 }
 
-//I think this is correct
+
 Mesh* gf3d_mesh_new()
 {
+    Uint8 foundIndex;
+    Uint32 emptyIndex;
     int c;
 
     for (c = 0; c < meshManager.meshCount; c++)
     {
-        if (meshManager.meshList[c]._refCount == 0 && (strlen(meshManager.meshList[c].filename) == 0))
+
+        if (meshManager.meshList[c]._refCount == 0)
         {
-
-            meshManager.meshList[c].primitives = gfc_list_new();
-
-            if (meshManager.meshList[c].primitives == NULL)
+            if (!foundIndex)
             {
-                slog("Cannot allocate memory for a new mesh!");
-                return NULL;
+                foundIndex = 1;
+                emptyIndex = c;
             }
-            meshManager.meshList[c]._refCount = 1;
 
-            return &meshManager.meshList[c];
+
+            if ((strlen(meshManager.meshList[c].filename) == 0))
+            {
+                meshManager.meshList[c].primitives = gfc_list_new();
+
+                if (meshManager.meshList[c].primitives == NULL)
+                {
+                    slog("Cannot allocate memory for a new mesh!");
+                    return NULL;
+                }
+                meshManager.meshList[c]._refCount = 1;
+
+                return &meshManager.meshList[c];
+            }
+
+
         }
 
-        if (strlen(meshManager.meshList[c].filename) > 0)
-        {
-            gf3d_mesh_delete(&meshManager.meshList[c]);
-        }
         
+    }
+
+    if (strlen(meshManager.meshList[c].filename) > 0)
+    {
+        gf3d_mesh_delete(&meshManager.meshList[c]);
+    }
+
+    if (foundIndex)
+    {
+        gf3d_mesh_delete(&meshManager.meshList[emptyIndex]);
+        meshManager.meshList[emptyIndex].primitives = gfc_list_new();
+
+        if (meshManager.meshList[emptyIndex].primitives == NULL)
+        {
+            slog("Cannot allocate memory for a new mesh!");
+            return NULL;
+        }
+        meshManager.meshList[emptyIndex]._refCount = 1;
+
+        return &meshManager.meshList[emptyIndex];
+
     }
     return NULL;
 }
@@ -182,93 +213,85 @@ void gf3d_mesh_primitive_free(MeshPrimitive* prim)
     if (prim->faceBuffer != VK_NULL_HANDLE)
     {
         vkDestroyBuffer(meshManager.device, prim->faceBuffer,NULL);
+        prim->faceBuffer = VK_NULL_HANDLE;
     }
 
     if (prim->faceBufferMemory != VK_NULL_HANDLE)
     {
         vkFreeMemory(meshManager.device,prim->faceBufferMemory,NULL);
+        prim->faceBufferMemory = VK_NULL_HANDLE;
     }
 
     if (prim->vertexBuffer != VK_NULL_HANDLE)
     {
         vkDestroyBuffer(meshManager.device,prim->vertexBuffer,NULL);
+        prim->vertexBuffer = VK_NULL_HANDLE;
     }
 
     if (prim->vertexBufferMemory != VK_NULL_HANDLE)
     {
         vkFreeMemory(meshManager.device, prim->vertexBufferMemory,NULL);
+        prim->vertexBufferMemory = VK_NULL_HANDLE;
     }
+
+    
 
     if (prim->objData)
     {
         gf3d_obj_free(prim->objData);
     }
 
-    //free(prim);
-    memset(prim, 0, sizeof(MeshPrimitive));
+    free(prim);
+    //memset(prim, 0, sizeof(MeshPrimitive));
 }
-
-/*
-int gf3d_mesh_buffer_create(Mesh* mesh)
-{
-    int i, c;
-    c = gfc_list_count();
-    MeshPrimitive *prim;
-    if (!mesh)
-       return NULL;
-
-    for (i = 0; i < c; i++)
-    {
-        prim = gfc_list_nth(mesh->primitives, i);
-        if (!prim)
-            continue;
-        if(!)//I DO NOT KNOW
-            //Not finished
-    }
-}
-*/
 
 int gf3d_prim_buffer_create(MeshPrimitive* prim)
 {
     Uint32 bufferSize = 0;
     VkBuffer stagingBuffer;
     VkDeviceMemory stagingBufferMemory;
+    void* data = NULL;
+
     if (!prim || !prim->objData)
         return 0;
 
     //FACE BUFFERS
-    bufferSize = (sizeof(prim->objData->face_count));
+    bufferSize = (sizeof(Face) * prim->objData->face_count);
+    gf3d_buffer_create(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &stagingBuffer, &stagingBufferMemory);
 
-    //Something from Sprite then remade;
+    vkMapMemory(meshManager.device, stagingBufferMemory, 0, bufferSize, 0, &data);
+    memcpy(data, prim->objData->outFace, (size_t)bufferSize);
+    vkUnmapMemory(meshManager.device, stagingBufferMemory);
+
+    gf3d_buffer_create(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &prim->faceBuffer, &prim->faceBufferMemory);
+
+    gf3d_buffer_copy(stagingBuffer, &prim->faceBuffer, bufferSize);
+
+    vkDestroyBuffer(meshManager.device, stagingBuffer, NULL);
+    vkFreeMemory(meshManager.device, stagingBufferMemory, NULL);
+
+    prim->faceCount = prim->objData->face_count;
+
+
+    //Vertex BUFFERS
+    bufferSize = (sizeof(Vertex) * prim->objData->face_vert_count);
+    gf3d_buffer_create(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &stagingBuffer, &stagingBufferMemory);
+
+    vkMapMemory(meshManager.device, stagingBufferMemory, 0, bufferSize, 0, &data);
+    memcpy(data, prim->objData->faceVertices, (size_t)bufferSize);
+    vkUnmapMemory(meshManager.device, stagingBufferMemory);
+
+    gf3d_buffer_create(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &prim->vertexBuffer, &prim->vertexBufferMemory);
+
+    gf3d_buffer_copy(stagingBuffer, &prim->vertexBuffer, bufferSize);
+
+    vkDestroyBuffer(meshManager.device, stagingBuffer, NULL);
+    vkFreeMemory(meshManager.device, stagingBufferMemory, NULL);
     
-
-    //Vertex buffers
-    //I DO NOT KNOW WHAT HE COPPIED INTO HERE?
-
-    return 0;
-    //return 1;
-    //Not finished
+    
+    return 1;
 }
 
-int gf3d_mesh_primitive_buffer_create(MeshPrimitive* prim)
-{
-    //I Do not know
-    //Not finished
-    prim->vertexCount = prim->objData->face_vert_count;
-    prim->faceCount = prim;//IDK;
-}
-
-int mesh_obj_buffer()
-{
-    //I dont know
-    //Not finished
-}
-
-int gf3d_mesg_obj_buffer_create(Mesh* mesh)
-{
-    //Not finished
-    //I don't know
-}
 
 Mesh* gf3d_mesh_load_obj(const char* filename)
 { 
@@ -301,11 +324,11 @@ Mesh* gf3d_mesh_load_obj(const char* filename)
     if (!prim)
     {
         slog("Failed to load mesh primitive! For filename: %f", filename);
-        gf3d_mesh_free(mesh);
+        gf3d_mesh_delete(mesh);
         return NULL;
     }
-    mesh->primitives = gfc_list_new();
-    gfc_list_append(mesh->primitives, prim);
+    //mesh->primitives = gfc_list_new();
+   
 
     data = gf3d_obj_load_from_file(filename);
     if (!data)
@@ -317,38 +340,21 @@ Mesh* gf3d_mesh_load_obj(const char* filename)
     }
 
     prim->objData = data;
-    
-    //Last spot working
 
     //Need to fill prim?
 
-    prim->vertexCount = 3;
-    gf3d_mesh_primitive_create_vertex_buffer(prim);
-    gf3d_mesh_primitive_create_face_buffer(prim);
-
-    /*
-    Uint32          vertexCount;
-    VkBuffer        vertexBuffer;
-    VkDeviceMemory  vertexBufferMemory;
-    Uint32          faceCount;
-    VkBuffer        faceBuffer;
-    VkDeviceMemory  faceBufferMemory;
-    ObjData* objData;
-    */
-
-    
-    /*
-    if (!gf3d_mesh_buffer_create(mesh))
+    if (!gf3d_prim_buffer_create(prim))
     {
-        slog("Failed to build memory buffers for meash %s", filename);
         gf3d_mesh_delete(mesh);
+        gf3d_mesh_primitive_free(prim);
+        slog("Failed to make prim buffer data %s", filename);
         return NULL;
     }
-    */
+ 
+    gfc_list_append(mesh->primitives,prim);
+    //If you want a have multiple primitives do it here
     gfc_line_cpy(mesh->filename, filename);
 }
-
-
 
 MeshPrimitive* gf3d_mesh_primitive_new()
 {
@@ -363,16 +369,14 @@ MeshPrimitive* gf3d_mesh_primitive_new()
 
     return prim;
 
-    //Finished, 
+    //Finished?
 }
 
 VkVertexInputAttributeDescription* gf3d_mesh_get_attribute_descriptions(Uint32* count)
 {
-    //IDK
-    //Given to model?
     if (count)
     {
-        *count = MESH_ATTRIBUTE_COUNT;//3 IDK?
+        *count = MESH_ATTRIBUTE_COUNT;
     }
 
     meshManager.attributeDescriptions[0].binding = 0;
@@ -406,10 +410,16 @@ VkVertexInputBindingDescription* gf3d_mesh_get_bind_description()
 //Finished?
 void gf3d_mesh_queue_render(Mesh* mesh, Pipeline* pipe, void* uboData, Texture* texture)
 {
-    if (!mesh || !pipe || !uboData || !texture)
-        return;
     int c, i;
-    MeshPrimitive *prim;
+    MeshPrimitive* prim;
+
+    if (!mesh || !pipe || !uboData || !texture)
+    {
+        slog("Something wrong in mesh queue renderer");
+        return;
+    }
+        
+
 
     c = gfc_list_count(mesh->primitives);
 
@@ -421,95 +431,4 @@ void gf3d_mesh_queue_render(Mesh* mesh, Pipeline* pipe, void* uboData, Texture* 
         gf3d_pipeline_queue_render(pipe,prim->vertexBuffer,prim->vertexCount,prim->faceBuffer,uboData,texture);
     }
     
-}
-
-/**
- * @brief given a model matrix and basic color, build the meshUBO needed to render a model
- * @param modelMat the model Matrix
- * @param colorMod the color for the UBO
- */
-MeshUBO gf3d_mesh_get_ubo(GFC_Matrix4 modelMat, GFC_Color colorMod)
-{
-    //IDK WHAT THIS IS FOR?
-
-    
-}
-
-
-
-
-
-void gf3d_mesh_primitive_create_vertex_buffer(MeshPrimitive* prim)
-{
-    void* data = NULL;
-    VkDevice device = gf3d_vgraphics_get_default_logical_device();
-    Face* faces;
-    Uint32 fcount;
-    size_t bufferSize;
-    VkBuffer stagingBuffer;
-    VkDeviceMemory stagingBufferMemory = VK_NULL_HANDLE;
-
-    if (!prim)
-    {
-        slog("No mesh primitize provided");
-        return;
-    }
-
-    faces = prim->objData->outFace;
-    fcount = prim->objData->face_count;
-    bufferSize = sizeof(Face) * fcount;
-    gf3d_buffer_create(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
-        VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &stagingBuffer, &stagingBufferMemory);
-
-    vkMapMemory(device, stagingBufferMemory, 0, bufferSize, 0, &data);
-    memcpy(data, faces, (size_t)bufferSize);
-    vkUnmapMemory(device, stagingBufferMemory);
-
-    gf3d_buffer_create(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
-        VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &prim->faceBuffer, &prim->faceBufferMemory);
-
-    gf3d_buffer_copy(stagingBuffer, prim->faceBuffer, bufferSize);
-
-    prim->faceCount = fcount;
-
-    vkDestroyBuffer(device, stagingBuffer, NULL);
-    vkFreeMemory(device, stagingBufferMemory, NULL);
-}
-
-void gf3d_mesh_primitive_create_face_buffer(MeshPrimitive* prim)
-{
-    void* data = NULL;
-    VkDevice device = gf3d_vgraphics_get_default_logical_device();
-    Face* faces;
-    Uint32 fcount;
-    size_t bufferSize;
-    VkBuffer stagingBuffer;
-    VkDeviceMemory stagingBufferMemory = VK_NULL_HANDLE;
-
-    if (!prim)
-    {
-        slog("No mesh primitize provided");
-        return;
-    }
-
-    faces = prim->objData->outFace;
-    fcount = prim->objData->face_count;
-    bufferSize = sizeof(Face) * fcount;
-    gf3d_buffer_create(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
-        VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &stagingBuffer, &stagingBufferMemory);
-
-    vkMapMemory(device, stagingBufferMemory, 0, bufferSize, 0, &data);
-    memcpy(data, faces, (size_t)bufferSize);
-    vkUnmapMemory(device, stagingBufferMemory);
-
-    gf3d_buffer_create(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
-        VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &prim->faceBuffer, &prim->faceBufferMemory);
-
-    gf3d_buffer_copy(stagingBuffer, prim->faceBuffer, bufferSize);
-
-    prim->faceCount = fcount;
-
-    vkDestroyBuffer(device, stagingBuffer, NULL);
-    vkFreeMemory(device, stagingBufferMemory, NULL);
-
 }

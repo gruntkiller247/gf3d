@@ -18,37 +18,84 @@ typedef struct
 
 }ModelManager;
 
-
-
-static ModelManager model_manager = { 0 };
-
-void model_init_system(Uint32 modelCount)
-{
-	//Pipeline made here?
-	//Stolen from sprite?
-	//NEED TO DO
-	//Add a flag read on json that checks if the model should be kept as a model used often such as a player model or grenade
-
-	//Steal the mesh creation code and replace here
-
-	//Need to 
-	gf3d_mesh_init(1024);
-
-	model_manager.defaultTexture = gf3d_texture_load("images/default.png");
-
-	if (!model_manager.defaultTexture)
-	{
-		slog("DEFAULT TEXTURE DOES NOT EXIST!");
-		return;
-	}
-}
-
 //functions to make
-//model_free
 //movel_render
 //model render generic
 //model close - use model delete
 //gf3d_texture_free(model_manager.defaultTexture
+void model_delete(Model* model);
+void model_close();
+
+static ModelManager modelManager = { 0 };
+
+void model_init_system(Uint32 modelCount)
+{
+	Uint32 count;
+	
+	if (!modelCount)
+	{
+		slog("Can't create model manager with 0");
+		return;
+	}
+
+	if (modelManager.modelCount != 0)
+	{
+		slog("Cannot intialize model system twice!");
+		return;
+	}
+	
+	modelManager.modelList = (Model*)gfc_allocate_array(sizeof(Model), modelCount);
+
+	if (!modelManager.modelList)
+	{
+		slog("Failed to make modelList in model manager!");
+		return;
+	}
+
+	gf3d_mesh_init(1024);
+
+	modelManager.device = gf3d_vgraphics_get_default_logical_device();
+
+	gf3d_mesh_get_attribute_descriptions(&count);
+	modelManager.pipe = gf3d_pipeline_create_from_config(
+		gf3d_vgraphics_get_default_logical_device(),
+		"config/model_pipeline.cfg",
+		gf3d_vgraphics_get_view_extent(),
+		modelCount,
+		gf2d_sprite_get_bind_description(),
+		gf2d_sprite_get_attribute_descriptions(NULL),
+		count,
+		sizeof(ModelUBO),
+		VK_INDEX_TYPE_UINT16
+	);
+
+	modelManager.defaultTexture = gf3d_texture_load("images/default.png");
+
+	if (!modelManager.defaultTexture)
+	{
+		slog("DEFAULT TEXTURE DOES NOT EXIST!");
+		return;
+	}
+
+	atexit(model_close);
+	
+}
+
+void model_close()
+{
+	int i;
+	gf3d_texture_free(modelManager.defaultTexture);
+
+	//Do a loop to clear everything
+
+	for (i = 0; i < modelManager.modelCount; i++)
+	{
+		model_free(&modelManager.modelList[i]);
+	}
+
+	//Did I miss something?
+
+}
 
 void model_free(Model* model)
 {
@@ -78,18 +125,42 @@ void model_delete(Model* model)
 //Model new
 //Simliar to mesh?
 
+//I think this is correct
 Model* modelNew()
 {
 	//Simliar to mesh, no primitives
-	//If no ref count && no fl=ilenam set ref count to 1 and return a pointer
+	//If no ref count && no filename set ref count to 1 and return a pointer
 	//Otherwise if ref count is 0 and there is a file name, delete that part in memory in the array
-	return NULL;
-}
 
-void model_close()
-{
-	slog("DID NOT WRITE MODEL_CLOSE!");
-	return;
+	int c;
+	int foundEmptyIndex;
+	int emptyIndex;
+
+	for (c = 0; c < modelManager.modelCount; c++)
+	{
+		if(modelManager.modelList[c]._refCount != 0)
+			continue;
+
+		if (emptyIndex < 0)
+			emptyIndex = c;
+
+		if (modelManager.modelList[c]._refCount == NULL && strlen(modelManager.modelList[c].fileName) == 0)
+		{
+			modelManager.modelList[c]._refCount = 1;
+			return &modelManager.modelList[c];
+		}
+	}
+
+	
+	model_delete(&modelManager.modelList[emptyIndex]);
+	modelManager.modelList[emptyIndex]._refCount = 1;
+	return &modelManager.modelList[emptyIndex];
+
+	
+
+	//slog("Failed to make a new model!");
+
+	//return NULL;
 }
 
 Model* model_load(const char* filename)
@@ -153,12 +224,12 @@ Model* model_load(const char* filename)
 		texture = gf3d_texture_load(str2);
 		if (!texture)
 		{
-			texture = model_manager.defaultTexture;
+			texture = modelManager.defaultTexture;
 		}
 	}
 	else
 	{
-		texture = model_manager.defaultTexture;
+		texture = modelManager.defaultTexture;
 	}
 	
 
@@ -176,18 +247,22 @@ Model* model_load(const char* filename)
 	
 }
 
-//Complete to his ingame stuff
+//I think this is right
 Model* get_by_filename(const char *filename)
 {
+	int c;
 	if (!filename)
 		return NULL;
 
-	for (int c = 0; c < model_manager.modelCount; c++)
+	for (c = 0; c < modelManager.modelCount; c++)
 	{
-		if (model_manager.modelList[c]._refCount == 0)
+		if (modelManager.modelList[c]._refCount == 0)
 			continue;
-		if (gfc_strcmp(model_manager.modelList[c].fileName, filename) == 0)
-			return &model_manager.modelList[c].fileName;
+		if (modelManager.modelList[c].fileName == NULL)
+			continue;
+
+		if (gfc_strlcmp(modelManager.modelList[c].fileName, filename) == 0)
+			return &modelManager.modelList[c];
 	}
 
 	return NULL;
@@ -195,10 +270,8 @@ Model* get_by_filename(const char *filename)
 }
 
 
-
-ModelUBO model_get_ubo(
-	GFC_Matrix4 modelMat,
-	GFC_Color colormod)
+//I think this is wrong
+ModelUBO model_get_ubo(GFC_Matrix4 modelMat,GFC_Color colormod)
 {
 	ModelUBO ubo = { 0 };
 	GFC_Matrix4* view;
@@ -210,6 +283,7 @@ ModelUBO model_get_ubo(
 	}
 	gf3d_vgraphics_get_projection_matrix(&ubo.proj);
 	ubo.color = gfc_color_to_vector4f(colormod);
+	return ubo;
 }
 
 
@@ -219,7 +293,7 @@ void gf3d_model_queue_render(Model* model,GFC_Matrix4 mat,GFC_Color colormod)
 		return;
 	
 	ModelUBO ubo = model_get_ubo(mat, colormod);
-	gf3d_mesh_queue_render(model->mesh,model_manager.pipe,&ubo ,model->texture); //IDK
+	gf3d_mesh_queue_render(model->mesh,modelManager.pipe,&ubo ,model->texture); //IDK
 	//gf3d_pipeline_queue_render(model_manager.pipe,mesh);
 }
 
@@ -231,21 +305,23 @@ void gf3d_mesh_reset_pipes()
 }
 */
 
-void model_queue_render(Model* model, GFC_Matrix4 mat,GFC_Color color)
+//become Sky
+void sky_queue_render(Model* model, GFC_Matrix4 mat,GFC_Color color)
 {
 	//IDK
-}
-
-void gf3d_mesh_primitive_queue_render(MeshPrimitive* prim, Pipeline* pipe, void* uboData, Texture* texture)
-{
-	if ((!prim) || (!pipe) || (!uboData)) 
+	ModelUBO ubo;
+	if (!model)
 		return;
 
-	if (!texture)
-	{
-		texture = model_manager.defaultTexture;
-	}
-		
+	ubo = model_get_ubo(mat, color);
 	
-	gf3d_pipeline_queue_render(pipe, prim->vertexBuffer, prim->vertexCount, prim->faceBuffer, uboData, texture);
+	//I think this is wrong
+	gf3d_mesh_queue_render(model->mesh,modelManager.pipe,&ubo,model->texture);
 }
+
+Pipeline* modelGetPipeline()
+{
+	return modelManager.pipe;
+}
+
+

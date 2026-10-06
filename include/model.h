@@ -35,4 +35,8 @@ void model_free(Model* model);
 
 void model_queue_render(Model* model, GFC_Matrix4 mat, GFC_Color colormod);
 
+ModelUBO gf3d_model_get_ubo(GFC_Matrix4 modelMat, GFC_Color colorMod);
+
+Model* get_by_filename(const char* filename);
+
 #endif
