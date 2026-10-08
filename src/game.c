@@ -43,35 +43,41 @@ int main(int argc,char *argv[])
     //local variables
     Model* model;
     Sprite *bg;
-    GFC_Matrix4* mat;
-    GFC_Matrix4* view;
+    GFC_Matrix4 mat;
+    GFC_Matrix4 *view;
+    GFC_Vector3D offset = { 0,-10,0 };
     //initializtion    
     parse_arguments(argc,argv);
     init_logger("gf3d.log",0);
     slog("gf3d begin");
     //gfc init
+    
     gfc_input_init("config/input.cfg");
+
     gfc_config_def_init();
+
     gfc_action_init(1024);
+
     //gf3d init
     gf3d_vgraphics_init("config/setup.cfg");
     gf2d_font_init("config/font.cfg");
     gf2d_actor_init(1000);
 
-    GFC_Vector3D offset = { 0,-10,0 };
     
-    //mat = gfc_mat4_identity(mat);
-    //void gfc_matrix4_view(*view, gfc_vector3d(0, -10.0, 0), gfc_vecto3d(0, 0, 0), gfc_vector3d(0, 0, 1)); IDK
-    //gfc matrix4 identity(mat);
+   
+    
     //game init
-    
+    gfc_matrix4_identity(mat);
+    view = gf3d_vgraphics_get_view_matrix();
 
     srand(SDL_GetTicks());
     slog_sync();
-    bg = gf2d_sprite_load_image("images/bg_flat.png");
-    gf2d_mouse_load("actors/mouse.actor");
-    model = model_load("model/dino/dino.model");
 
+    bg = gf2d_sprite_load_image("images/bg_flat.png");
+
+    gf2d_mouse_load("actors/mouse.actor");
+    model = model_load("models/dino/dino.model");
+    
     // main game loop    
     while(!_done)
     {
@@ -83,7 +89,10 @@ int main(int argc,char *argv[])
         //camera updates
         gf3d_vgraphics_render_start();
         //3D draw
-        //model_queue_render(Model * model, gf); IDK
+        //Camera position, position camera is looking, what is considered up
+        gfc_matrix4_view(*view, gfc_vector3d(0, -10, 0), gfc_vector3d(0, 0, 0), gfc_vector3d(0, 0, 1));
+
+        gf3d_model_queue_render(model,mat,GFC_COLOR_WHITE);
                 //2D draws
                 //gf2d_sprite_draw_image(bg,gfc_vector2d(0,0));
                 

@@ -45,6 +45,8 @@ Mesh* gf3d_mesh_get_by_filename(const char* fileName)
         }
     }
 
+    
+
     return NULL;
 }
 
@@ -70,19 +72,9 @@ void gf3d_mesh_init(Uint32 mesh_max)
         return;
 
     //meshManager.chainLength = gf3d_swapchain_get_chain_length();
-    meshManager.device = gf3d_vgraphics_get_default_logical_device;
+    meshManager.device = gf3d_vgraphics_get_default_logical_device(); 
     meshManager.meshCount = mesh_max;
-
-    
-
-    /*
-    if (!model->pipe)
-    {
-        slog("Failed to make pipeline for models");
-        model_close();
-        return;
-    }*/
-
+    slog("Initiate Mesh System");
     atexit(gf3d_mesh_close);
 }
 
@@ -106,7 +98,7 @@ void gf3d_mesh_close()
 
 Mesh* gf3d_mesh_new()
 {
-    Uint8 foundIndex;
+    Uint8 foundIndex = 0;
     Uint32 emptyIndex;
     int c;
 
@@ -147,7 +139,7 @@ Mesh* gf3d_mesh_new()
         gf3d_mesh_delete(&meshManager.meshList[c]);
     }
 
-    if (foundIndex)
+    if (foundIndex != 0)
     {
         gf3d_mesh_delete(&meshManager.meshList[emptyIndex]);
         meshManager.meshList[emptyIndex].primitives = gfc_list_new();
@@ -252,25 +244,41 @@ int gf3d_prim_buffer_create(MeshPrimitive* prim)
     VkDeviceMemory stagingBufferMemory;
     void* data = NULL;
 
-    if (!prim || !prim->objData)
+    if (!prim)
+    {
+        slog("FAILED TO GIVE PRIM BUFFER CREATE A PRIM YOU MONSTER!");
         return 0;
+    }
+
+    if (!prim->objData)
+    {
+        slog("FAILED TO GIVE ME A PRIM WITH OBJDATA!");
+        return 0;
+    }
+
+    if (!prim->objData->face_count)
+    {
+        slog("FAILED TO GIVE ME A PRIM WITH OBJ DATA WITH A FACE COUNT!");
+        return 0;
+    }
+        
 
     //FACE BUFFERS
     bufferSize = (sizeof(Face) * prim->objData->face_count);
     gf3d_buffer_create(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &stagingBuffer, &stagingBufferMemory);
 
-    vkMapMemory(meshManager.device, stagingBufferMemory, 0, bufferSize, 0, &data);
+    vkMapMemory(meshManager.device, stagingBufferMemory, 0, bufferSize, 0, &data) != VK_SUCCESS;
     memcpy(data, prim->objData->outFace, (size_t)bufferSize);
     vkUnmapMemory(meshManager.device, stagingBufferMemory);
 
     gf3d_buffer_create(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &prim->faceBuffer, &prim->faceBufferMemory);
 
-    gf3d_buffer_copy(stagingBuffer, &prim->faceBuffer, bufferSize);
+    gf3d_buffer_copy(stagingBuffer, prim->faceBuffer, bufferSize);
 
     vkDestroyBuffer(meshManager.device, stagingBuffer, NULL);
     vkFreeMemory(meshManager.device, stagingBufferMemory, NULL);
 
-    prim->faceCount = prim->objData->face_count;
+  
 
 
     //Vertex BUFFERS
@@ -281,14 +289,15 @@ int gf3d_prim_buffer_create(MeshPrimitive* prim)
     memcpy(data, prim->objData->faceVertices, (size_t)bufferSize);
     vkUnmapMemory(meshManager.device, stagingBufferMemory);
 
-    gf3d_buffer_create(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &prim->vertexBuffer, &prim->vertexBufferMemory);
+    gf3d_buffer_create(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, &prim->vertexBuffer, &prim->vertexBufferMemory);
 
-    gf3d_buffer_copy(stagingBuffer, &prim->vertexBuffer, bufferSize);
+    gf3d_buffer_copy(stagingBuffer, prim->vertexBuffer, bufferSize);
 
     vkDestroyBuffer(meshManager.device, stagingBuffer, NULL);
     vkFreeMemory(meshManager.device, stagingBufferMemory, NULL);
     
-    
+    prim->vertexCount = prim->objData->face_vert_count;
+      prim->faceCount = prim->objData->face_count;
     return 1;
 }
 
@@ -307,6 +316,7 @@ Mesh* gf3d_mesh_load_obj(const char* filename)
     
     if (mesh)
     {
+        slog("Found a mesh by filename!");
         mesh->_refCount++;
         return mesh;
     }
@@ -319,6 +329,8 @@ Mesh* gf3d_mesh_load_obj(const char* filename)
         return NULL;
     }
 
+    slog("Mesh was created!");
+
     prim = gf3d_mesh_primitive_new();
 
     if (!prim)
@@ -328,6 +340,8 @@ Mesh* gf3d_mesh_load_obj(const char* filename)
         return NULL;
     }
     //mesh->primitives = gfc_list_new();
+
+    slog("Mesh Prim created!");
    
 
     data = gf3d_obj_load_from_file(filename);
@@ -338,6 +352,8 @@ Mesh* gf3d_mesh_load_obj(const char* filename)
         slog("Failed to allocate objData for mesh!");
         return NULL;
     }
+
+    slog("Data prim created!");
 
     prim->objData = data;
 
@@ -350,6 +366,8 @@ Mesh* gf3d_mesh_load_obj(const char* filename)
         slog("Failed to make prim buffer data %s", filename);
         return NULL;
     }
+
+    slog("Prim buffers created!");
  
     gfc_list_append(mesh->primitives,prim);
     //If you want a have multiple primitives do it here
@@ -374,10 +392,7 @@ MeshPrimitive* gf3d_mesh_primitive_new()
 
 VkVertexInputAttributeDescription* gf3d_mesh_get_attribute_descriptions(Uint32* count)
 {
-    if (count)
-    {
-        *count = MESH_ATTRIBUTE_COUNT;
-    }
+
 
     meshManager.attributeDescriptions[0].binding = 0;
     meshManager.attributeDescriptions[0].location = 0;
@@ -394,6 +409,10 @@ VkVertexInputAttributeDescription* gf3d_mesh_get_attribute_descriptions(Uint32* 
     meshManager.attributeDescriptions[2].format = VK_FORMAT_R32G32_SFLOAT;
     meshManager.attributeDescriptions[2].offset = offsetof(Vertex, texel);
 
+    if (count)
+    {
+        *count = MESH_ATTRIBUTE_COUNT;
+    }
 
     return meshManager.attributeDescriptions;
 }
@@ -417,9 +436,7 @@ void gf3d_mesh_queue_render(Mesh* mesh, Pipeline* pipe, void* uboData, Texture* 
     {
         slog("Something wrong in mesh queue renderer");
         return;
-    }
-        
-
+    } 
 
     c = gfc_list_count(mesh->primitives);
 

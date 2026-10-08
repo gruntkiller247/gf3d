@@ -105,6 +105,8 @@ void gf2d_sprite_manager_init(Uint32 max_sprites)
     VkBuffer stagingBuffer;
     VkDeviceMemory stagingBufferMemory;
 
+    
+
     if (max_sprites == 0)
     {
         slog("cannot intilizat sprite manager for 0 sprites");
@@ -114,6 +116,8 @@ void gf2d_sprite_manager_init(Uint32 max_sprites)
     gf2d_sprite.sprite_list = (Sprite *)gfc_allocate_array(sizeof(Sprite),max_sprites);
     gf2d_sprite.max_sprites = max_sprites;
     gf2d_sprite.device = gf3d_vgraphics_get_default_logical_device();
+
+    
     
     // setup the face buffer, which will be used for ALL sprites
     faces[0].verts[0] = 2;
@@ -124,6 +128,8 @@ void gf2d_sprite_manager_init(Uint32 max_sprites)
     faces[1].verts[2] = 2;
 
     bufferSize = sizeof(SpriteFace) * 2;
+
+   
     
     gf3d_buffer_create(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &stagingBuffer, &stagingBufferMemory);
 
@@ -138,7 +144,12 @@ void gf2d_sprite_manager_init(Uint32 max_sprites)
     vkDestroyBuffer(gf2d_sprite.device, stagingBuffer, NULL);
     vkFreeMemory(gf2d_sprite.device, stagingBufferMemory, NULL);
 
+    
+
     gf2d_sprite_get_attribute_descriptions(&count);
+
+  
+
     gf2d_sprite.pipe = gf3d_pipeline_create_from_config(
         gf3d_vgraphics_get_default_logical_device(),
         "config/overlay_pipeline.cfg",
@@ -150,6 +161,10 @@ void gf2d_sprite_manager_init(Uint32 max_sprites)
         sizeof(SpriteUBO),
         VK_INDEX_TYPE_UINT16
     );     
+
+  
+
+    
     
     if(__DEBUG)slog("sprite manager initiliazed");
     atexit(gf2d_sprite_manager_close);
@@ -587,6 +602,7 @@ VkVertexInputAttributeDescription * gf2d_sprite_get_attribute_descriptions(Uint3
 
 Pipeline *gf2d_sprite_get_pipeline()
 {
+   
     return gf2d_sprite.pipe;
 }
 

@@ -204,14 +204,12 @@
     <None Include="..\config\audio.cfg" />
     <None Include="..\config\font.cfg" />
     <None Include="..\config\input.cfg" />
-    <None Include="..\config\overlay_pipeline.cfg" />
     <None Include="..\config\setup.cfg" />
     <None Include="..\config\sky_pipeline.cfg" />
     <None Include="..\shaders\model.frag" />
     <None Include="..\shaders\model.vert" />
     <None Include="..\shaders\sprite.frag" />
     <None Include="..\shaders\sprite.vert" />
-    <None Include="model_pipeline.cfg" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

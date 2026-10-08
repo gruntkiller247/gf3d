@@ -352,9 +352,6 @@
     <None Include="..\config\input.cfg">
       <Filter>CFG</Filter>
     </None>
-    <None Include="..\config\overlay_pipeline.cfg">
-      <Filter>CFG</Filter>
-    </None>
     <None Include="..\config\setup.cfg">
       <Filter>CFG</Filter>
     </None>
@@ -366,9 +363,6 @@
     </None>
     <None Include="..\shaders\sprite.vert">
       <Filter>Shaders</Filter>
-    </None>
-    <None Include="model_pipeline.cfg">
-      <Filter>CFG</Filter>
     </None>
     <None Include="..\shaders\model.vert">
       <Filter>Shaders</Filter>

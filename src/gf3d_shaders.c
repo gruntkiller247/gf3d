@@ -32,7 +32,7 @@ char *gf3d_shaders_load_data(const char * filename,size_t *rsize)
     buffer = gfc_pak_file_extract(filename,&size);
     if (!buffer)
     {
-        slog("failed to laod shader file %s",filename);
+        slog("failed to load shader file %s",filename);
         return NULL;
     }    
     if (rsize)*rsize = size;
