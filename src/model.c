@@ -382,6 +382,7 @@ ModelUBO model_get_ubo(GFC_Matrix4 modelMat,GFC_Color colormod)
 	gfc_matrix4_slog(ubo.proj);
 	slog("\n");
 	*/
+	
 	return ubo;
 }
 

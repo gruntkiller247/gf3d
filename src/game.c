@@ -77,7 +77,7 @@ int main(int argc,char *argv[])
 
     gf2d_mouse_load("actors/mouse.actor");
     model = model_load("models/dino/dino.model");
-    
+    int spin = -10;
     // main game loop    
     while(!_done)
     {
@@ -90,7 +90,10 @@ int main(int argc,char *argv[])
         gf3d_vgraphics_render_start();
         //3D draw
         //Camera position, position camera is looking, what is considered up
-        gfc_matrix4_view(*view, gfc_vector3d(0, -10, 0), gfc_vector3d(0, 0, 0), gfc_vector3d(0, 0, 1));
+        gfc_matrix4_view(*view, gfc_vector3d(0, spin, 0), gfc_vector3d(0, 0, 0), gfc_vector3d(0, 0, 1));
+        //spin++;
+        if (spin >= 360)
+            spin = -10;
 
         gf3d_model_queue_render(model,mat,GFC_COLOR_WHITE);
                 //2D draws
