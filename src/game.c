@@ -22,6 +22,8 @@
 
 #include "gf3d_mesh.h"
 #include "model.h"
+#include "entity.h"
+#include "player.h"
 
 extern int __DEBUG;
 
@@ -76,8 +78,12 @@ int main(int argc,char *argv[])
     bg = gf2d_sprite_load_image("images/bg_flat.png");
 
     gf2d_mouse_load("actors/mouse.actor");
-    model = model_load("models/dino/dino.model");
-    int spin = -10;
+    //model = model_load("models/dino/dino.model");
+    
+    //ERRROR
+    GFC_Vector3D place = gfc_vector3d(0, 10, 0);
+    spawnPlayer(place);
+
     // main game loop    
     while(!_done)
     {
@@ -90,14 +96,18 @@ int main(int argc,char *argv[])
         gf3d_vgraphics_render_start();
         //3D draw
         //Camera position, position camera is looking, what is considered up
-        gfc_matrix4_view(*view, gfc_vector3d(0, spin, 0), gfc_vector3d(0, 0, 0), gfc_vector3d(0, 0, 1));
+        gfc_matrix4_view(*view, gfc_vector3d(0, 0, 0), gfc_vector3d(0, 0, 0), gfc_vector3d(0, 0, 1));
         //spin++;
-        if (spin >= 360)
-            spin = -10;
+        
+        entityThinkAll();
+        entityUpdateAll();
+        entityDrawAll();
 
-        gf3d_model_queue_render(model,mat,GFC_COLOR_WHITE);
+       //Draw Sky here
                 //2D draws
                 //gf2d_sprite_draw_image(bg,gfc_vector2d(0,0));
+
+        
                 
         
                 gf2d_font_draw_line_tag("ALT+F4 to exit",FT_H1,GFC_COLOR_WHITE, gfc_vector2d(10,10));
