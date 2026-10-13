@@ -6,6 +6,8 @@
 
 Entity* spawnPlayer(GFC_Vector3D position);
 
+void playerThink(Entity* self);
+
 
 
 

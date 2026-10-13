@@ -4,6 +4,8 @@
 #include "model.h"
 #include "gfc_color.h"
 
+
+
 typedef struct Entity_S
 {
 	Uint8			_inUse;
@@ -22,6 +24,9 @@ typedef struct Entity_S
 	int		(*update)(struct Entity_S* self);
 	int		(*draw)(struct Entity_S* self);
 	int		(*free)(struct Entity_S* self);
+	void*	data;
+
+	GFC_TextLine	name;
 
 }Entity;
 
@@ -29,7 +34,7 @@ typedef struct Entity_S
 	@brief initialize the entity manager and pre-allocate a bunch 
 	@param maxEnts how many entities can exist at any single moment
 */
-void entity_init(Uint32 maxEnts);
+void entityInit(Uint32 maxEnts);
 
 
 /*
@@ -60,6 +65,6 @@ void entityThinkAll();
 */
 void entityDrawAll();
 
-void playerThink(Entity* self);
+
 
 #endif

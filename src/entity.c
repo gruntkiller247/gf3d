@@ -22,11 +22,17 @@ void entityClose();
 void entityFree(Entity* thing);
 
 
-void entity_init(Uint32 maxEnts)
+void entityInit(Uint32 maxEnts)
 {
 	if (!maxEnts)
 	{
 		slog("Failed to initalize entiy system");
+		return;
+	}
+
+	if (entityManager.maxEnts != 0)
+	{
+		slog("Cannot make a second entity manager!");
 		return;
 	}
 
@@ -138,6 +144,7 @@ void entityDraw(Entity* self)
 		}
 	}
 
+	//slog("I am being drawn and my name is %s",self->name);
 	
 	gfc_matrix4_from_vectors(self->mat, self->position, self->rotation, self->scale);
 
@@ -171,8 +178,12 @@ void entityFree(Entity* self)
 		return;
 	}
 
+	if (self->free)
+	{
+		self->free(self);
+	}
 	model_free(self->model);
-	memset(self,0,sizeof(Entity));
+	memset(self, 0, sizeof(Entity));
 }
 
 
@@ -182,13 +193,16 @@ void entityClose()
 
 	if (!entityManager.entityList)
 	{
+		slog("Trying to free enetityManger without an entityList!");
 		return;
 	}
 
 	for (c = 0; c < entityManager.maxEnts; c++)
 	{
-		if(entityManager.entityList[c]._inUse)
+		if (entityManager.entityList[c]._inUse)
 			entityFree(&entityManager.entityList[c]);
+		
+		
 	}
 
 	free(entityManager.entityList);
@@ -196,14 +210,4 @@ void entityClose()
 	slog("Entity System Closed!");
 }
 
-void playerThink(Entity* self)
-{
-	if (!self)
-	{
-		slog("Player does not exist!");
-	}
-	else
-	{
-		slog("I AM DOING IT! I AM THINKING!");
-	}
-}
+

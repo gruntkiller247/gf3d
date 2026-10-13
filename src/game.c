@@ -48,6 +48,10 @@ int main(int argc,char *argv[])
     GFC_Matrix4 mat;
     GFC_Matrix4 *view;
     GFC_Vector3D offset = { 0,-10,0 };
+
+    Entity* player;
+
+
     //initializtion    
     parse_arguments(argc,argv);
     init_logger("gf3d.log",0);
@@ -65,8 +69,8 @@ int main(int argc,char *argv[])
     gf2d_font_init("config/font.cfg");
     gf2d_actor_init(1000);
 
-    
-   
+    entityInit(10000);
+    player = spawnPlayer(gfc_vector3d(0, 0, 0));
     
     //game init
     gfc_matrix4_identity(mat);
@@ -75,14 +79,12 @@ int main(int argc,char *argv[])
     srand(SDL_GetTicks());
     slog_sync();
 
-    bg = gf2d_sprite_load_image("images/bg_flat.png");
+    //bg = gf2d_sprite_load_image("images/bg_flat.png");
 
     gf2d_mouse_load("actors/mouse.actor");
-    //model = model_load("models/dino/dino.model");
     
-    //ERRROR
-    GFC_Vector3D place = gfc_vector3d(0, 10, 0);
-    spawnPlayer(place);
+    
+    
 
     // main game loop    
     while(!_done)
@@ -96,7 +98,7 @@ int main(int argc,char *argv[])
         gf3d_vgraphics_render_start();
         //3D draw
         //Camera position, position camera is looking, what is considered up
-        gfc_matrix4_view(*view, gfc_vector3d(0, 0, 0), gfc_vector3d(0, 0, 0), gfc_vector3d(0, 0, 1));
+        gfc_matrix4_view(*view, gfc_vector3d(10, -20, 10), gfc_vector3d(0, 0, 0), gfc_vector3d(0, 0, 1));
         //spin++;
         
         entityThinkAll();

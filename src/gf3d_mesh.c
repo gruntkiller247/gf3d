@@ -170,17 +170,16 @@ void gf3d_mesh_delete(Mesh* mesh)
     for (d = 0; d < c; d++)
     {
         prim = gfc_list_nth(mesh->primitives, d);
-        if (!prim)
-            continue;
+        if (!prim)continue;
         gf3d_mesh_primitive_free(prim);
 
     }
-
+    //free list TODO
     if (mesh->primitives)
     {
         gfc_list_delete(mesh->primitives);
     }
-    memset(mesh, 0, sizeof(Mesh*));
+    memset(mesh, 0, sizeof(Mesh));
 }
 
 void gf3d_mesh_free(Mesh* mesh)
@@ -234,8 +233,7 @@ void gf3d_mesh_primitive_free(MeshPrimitive* prim)
     }
 
     free(prim);
-    //memset(prim, 0, sizeof(MeshPrimitive));
-}
+  }
 
 int gf3d_prim_buffer_create(MeshPrimitive* prim)
 {

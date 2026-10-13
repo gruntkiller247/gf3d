@@ -8,6 +8,7 @@ Entity* spawnPlayer(GFC_Vector3D position)
 {
 	Entity* self;
 	self = entityNew();
+
 	if (!self)
 	{
 		
@@ -18,6 +19,17 @@ Entity* spawnPlayer(GFC_Vector3D position)
 	self->model = model_load("models/dino/dino.model");
 	self->position = position;
 	self->think = playerThink;
+
+	strcpy(self->name, "DINOSAUR!");
 	
 	return self;
+}
+
+void playerThink(Entity* self)
+{
+	if (!self)
+	{
+		slog("Player does not exist!");
+	}
+
 }
