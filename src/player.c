@@ -88,7 +88,7 @@ int playerThink(Entity* self)
 
 	//slog("Player Update!");
 
-	if (gfc_input_command_down("panleft"));
+	if (gfc_input_command_down("panleft"))
 	{
 		//slog("Up!");
 		data->cameraRotation.x += 0.5;
@@ -114,9 +114,9 @@ int playerThink(Entity* self)
 
 
 
-	if (gfc_input_command_down("item_up"));
+	if (gfc_input_command_down("item_up"))
 	{
-		//slog("Up!");
+		slog("Up!");
 		move.y = 1;
 	}
 
@@ -137,7 +137,7 @@ int playerThink(Entity* self)
 	}
 
 
-	if (move.x || move.y)
+	if ((move.x) || (move.y))
 	{
 		gfc_vector3d_normalize(&move);
 
@@ -154,7 +154,7 @@ int playerThink(Entity* self)
 
 	self->rotation.z = data->cameraRotation.x;
 
-	if (gfc_vector3d_magnitude_squared(self->velocity) > 0.1)
+	if (gfc_vector3d_magnitude_squared(self->velocity) < 0.1)
 	{
 		gfc_vector3d_scale(self->velocity, self->velocity, 0.8);
 	}
