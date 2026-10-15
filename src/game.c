@@ -96,6 +96,9 @@ int main(int argc,char *argv[])
         gf2d_font_update();
         //camera updates
         gf3d_vgraphics_render_start();
+
+        //Draw Sky here
+
         //3D draw
         //Camera position, position camera is looking, what is considered up
         gfc_matrix4_view(*view, gfc_vector3d(10, -20, 10), gfc_vector3d(0, 0, 0), gfc_vector3d(0, 0, 1));
@@ -105,15 +108,12 @@ int main(int argc,char *argv[])
         entityUpdateAll();
         entityDrawAll();
 
-       //Draw Sky here
-                //2D draws
-                //gf2d_sprite_draw_image(bg,gfc_vector2d(0,0));
+       
+        //2D draws
+        //gf2d_sprite_draw_image(bg,gfc_vector2d(0,0));
+        gf2d_font_draw_line_tag("ALT+F4 to exit",FT_H1,GFC_COLOR_WHITE, gfc_vector2d(10,10));
+        gf2d_mouse_draw();
 
-        
-                
-        
-                gf2d_font_draw_line_tag("ALT+F4 to exit",FT_H1,GFC_COLOR_WHITE, gfc_vector2d(10,10));
-                gf2d_mouse_draw();
         gf3d_vgraphics_render_end();
         if (gfc_input_command_down("exit"))_done = 1; // exit condition
         game_frame_delay();

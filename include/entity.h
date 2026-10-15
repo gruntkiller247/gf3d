@@ -23,8 +23,8 @@ typedef struct Entity_S
 	int		(*think)(struct Entity_S* self);	
 	int		(*update)(struct Entity_S* self);
 	int		(*draw)(struct Entity_S* self);
-	int		(*free)(struct Entity_S* self);
-	void*	data;
+	int		(*free)(struct Entity_S* self);		
+	void*	data;								//Used for custom data. Must create a free function for it!
 
 	GFC_TextLine	name;
 

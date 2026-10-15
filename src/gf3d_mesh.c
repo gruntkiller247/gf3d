@@ -174,10 +174,11 @@ void gf3d_mesh_delete(Mesh* mesh)
         gf3d_mesh_primitive_free(prim);
 
     }
-    //free list TODO
+    //free list TODO - I don't remember what Kehoe ment by this
     if (mesh->primitives)
     {
         gfc_list_delete(mesh->primitives);
+        
     }
     memset(mesh, 0, sizeof(Mesh));
 }
