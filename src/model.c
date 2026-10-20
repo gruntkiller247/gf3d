@@ -99,7 +99,10 @@ void model_close()
 		model_free(&modelManager.modelList[i]);
 	}
 
-	//Did I miss something?
+	if (!modelManager.modelCount)
+		return;
+
+	modelManager.modelCount = 0;
 
 }
 

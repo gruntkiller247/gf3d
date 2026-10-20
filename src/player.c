@@ -8,7 +8,10 @@
 #include "player.h"
 #include "entity.h"
 #include "model.h"
+#include "level.h"
 
+static Level* theLevel = NULL;
+//Setup gets + setters!
 
 typedef struct
 {
@@ -69,6 +72,11 @@ void playerFree(Entity* self)
 int playerThink(Entity* self)
 {
 	GFC_Vector3D move = { 0 };
+	GFC_Vector3D floor;
+	GFC_Vector3D offset = { 0,-50,0 };
+	GFC_Vector3D offsetEdge;
+	GFC_Edge3D edge;
+
 	if (!self || !self->data)
 	{
 		slog("Player does not exist!");
@@ -79,36 +87,33 @@ int playerThink(Entity* self)
 	view = gf3d_vgraphics_get_view_matrix();
 	
 
-	GFC_Vector3D offset = { 0,-50,0 };
+	
 	gfc_vector3d_add(offset, self->position,offset);
 	
 	gfc_matrix4_view(*view, offset, self->position, gfc_vector3d(0,0,1));
 
 	PlayerData* data = (PlayerData*)self->data;
 
-	//slog("Player Update!");
-
 	if (gfc_input_command_down("panleft"))
 	{
-		//slog("Up!");
-		data->cameraRotation.x += 0.5;
+		data->cameraRotation.x += 0.05;
 
 		//GFC_RADTODEG Human degree, computer Radians
 	}
 
 	if (gfc_input_command_down("panright"))
 	{
-		data->cameraRotation.x -= 0.5;
+		data->cameraRotation.x -= 0.05;
 	}
 
 	if (gfc_input_command_down("panup"))
 	{
-		data->cameraRotation.y += 0.5;
+		data->cameraRotation.y += 0.05;
 	}
 
 	if (gfc_input_command_down("pandown"))
 	{
-		data->cameraRotation.y -= 0.5;
+		data->cameraRotation.y -= 0.05;
 	}
 
 
@@ -116,13 +121,11 @@ int playerThink(Entity* self)
 
 	if (gfc_input_command_down("item_up"))
 	{
-		slog("Up!");
 		move.y = 1;
 	}
 
 	if (gfc_input_command_down("item_down"))
 	{
-		//slog("Down!");
 		move.y = -1;
 	}
 
@@ -137,6 +140,28 @@ int playerThink(Entity* self)
 	}
 
 
+
+	offset = gfc_vector3d(0, 0, 100);
+	
+	
+	gfc_vector3d_add(offsetEdge.x,self->position,offset);
+	gfc_vector3d_add(offsetEdge.y, self->position, offset);
+	gfc_vector3d_add(offsetEdge.z, self->position, offset);
+
+	
+
+	edge = gfc_edge3d(self->position.x, self->position.y, self->position.z, );
+
+	if (levelLineTest(getLevel(), edge, &floor))
+	{
+		self->position.z = floor.z + 7; //7 is some number from the player model
+	}
+
+
+
+	
+
+
 	if ((move.x) || (move.y))
 	{
 		gfc_vector3d_normalize(&move);
@@ -149,10 +174,12 @@ int playerThink(Entity* self)
 	gfc_vector3d_add(self->position, self->position, self->velocity);
 
 	gfc_vector3d_scale(offset, offset, data->cameraFollowDistance);
-	//gfc_vector3d_rotation();
 	gfc_vector3d_rotate_about_z(&offset,data->cameraRotation.x);
 
 	self->rotation.z = data->cameraRotation.x;
+
+	gfc_vector3d_rotate_about_x(&offset, data->cameraRotation.y);
+	self->rotation.y = data->cameraRotation.y;
 
 	if (gfc_vector3d_magnitude_squared(self->velocity) < 0.1)
 	{
@@ -160,7 +187,7 @@ int playerThink(Entity* self)
 	}
 	else
 	{
-		slog("Clearing!");
+		//slog("Clearing!");
 		gfc_vector3d_clear(self->velocity);
 	}
 

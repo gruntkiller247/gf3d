@@ -19,6 +19,9 @@
     <Filter Include="Shaders">
       <UniqueIdentifier>{99d563d8-08b9-49c2-968b-cd14cbc8c6cc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Levels">
+      <UniqueIdentifier>{fef38357-f48f-4b7f-9076-04ebf136f87f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\gf2d_actor.h">
@@ -189,6 +192,9 @@
     <ClInclude Include="..\include\player.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\level.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\game.c">
@@ -353,6 +359,9 @@
     <ClCompile Include="..\src\player.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\level.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\config\audio.cfg">
@@ -381,6 +390,9 @@
     </None>
     <None Include="..\shaders\model.frag">
       <Filter>Shaders</Filter>
+    </None>
+    <None Include="..\levels\testLevel.level">
+      <Filter>Levels</Filter>
     </None>
   </ItemGroup>
 </Project>

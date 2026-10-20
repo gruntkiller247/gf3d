@@ -85,22 +85,6 @@ void entityUpdate(Entity* self)
 			return;
 		}
 	}
-	/*
-	gfc_vector3d_add(self->position, self->position, self->velocity);
-	//Dampening
-
-	
-	if (gfc_vector3d_magnitude_squared(self->velocity) > 0.1)
-	{
-		gfc_vector3d_scale(self->velocity, self->velocity, 0.8);
-	}
-	else
-	{
-		gfc_vector3d_clear(self->velocity);
-	}
-	*/
-	
-
 }
 
 

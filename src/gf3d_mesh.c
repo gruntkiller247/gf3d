@@ -78,7 +78,6 @@ void gf3d_mesh_init(Uint32 mesh_max)
     atexit(gf3d_mesh_close);
 }
 
-
 void gf3d_mesh_close()
 {
     int c;
@@ -94,7 +93,6 @@ void gf3d_mesh_close()
     memset(&meshManager,0,sizeof(MeshManager));
 
 }
-
 
 Mesh* gf3d_mesh_new()
 {
@@ -300,7 +298,6 @@ int gf3d_prim_buffer_create(MeshPrimitive* prim)
     return 1;
 }
 
-
 Mesh* gf3d_mesh_load_obj(const char* filename)
 { 
     Mesh* mesh;
@@ -427,7 +424,6 @@ VkVertexInputBindingDescription* gf3d_mesh_get_bind_description()
     return &meshManager.bindingDescription;
 }
 
-//Finished?
 void gf3d_mesh_queue_render(Mesh* mesh, Pipeline* pipe, void* uboData, Texture* texture)
 {
     int c, i;

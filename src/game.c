@@ -24,6 +24,7 @@
 #include "model.h"
 #include "entity.h"
 #include "player.h"
+#include "level.h"
 
 extern int __DEBUG;
 
@@ -48,7 +49,7 @@ int main(int argc,char *argv[])
     GFC_Matrix4 mat;
     GFC_Matrix4 *view;
     GFC_Vector3D offset = { 0,-10,0 };
-
+    Level* level;
     Entity* player;
 
 
@@ -63,6 +64,9 @@ int main(int argc,char *argv[])
     gfc_config_def_init();
 
     gfc_action_init(1024);
+
+    //TO DO! Init audio!
+    //Need to init SDL first!
 
     //gf3d init
     gf3d_vgraphics_init("config/setup.cfg");
@@ -83,7 +87,8 @@ int main(int argc,char *argv[])
 
     gf2d_mouse_load("actors/mouse.actor");
     
-    
+    //Level Stuff
+    //level = levelLoad("level/textLevel.level");
     
 
     // main game loop    

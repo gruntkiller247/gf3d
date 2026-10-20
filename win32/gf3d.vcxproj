@@ -145,6 +145,7 @@
     <ClInclude Include="..\include\gf3d_validation.h" />
     <ClInclude Include="..\include\gf3d_vgraphics.h" />
     <ClInclude Include="..\include\gf3d_vqueues.h" />
+    <ClInclude Include="..\include\level.h" />
     <ClInclude Include="..\include\model.h" />
     <ClInclude Include="..\include\player.h" />
   </ItemGroup>
@@ -201,6 +202,7 @@
     <ClCompile Include="..\src\gf3d_validation.c" />
     <ClCompile Include="..\src\gf3d_vgraphics.c" />
     <ClCompile Include="..\src\gf3d_vqueues.c" />
+    <ClCompile Include="..\src\level.c" />
     <ClCompile Include="..\src\model.c" />
     <ClCompile Include="..\src\player.c" />
   </ItemGroup>
@@ -210,6 +212,7 @@
     <None Include="..\config\input.cfg" />
     <None Include="..\config\setup.cfg" />
     <None Include="..\config\sky_pipeline.cfg" />
+    <None Include="..\levels\testLevel.level" />
     <None Include="..\shaders\model.frag" />
     <None Include="..\shaders\model.vert" />
     <None Include="..\shaders\sprite.frag" />
