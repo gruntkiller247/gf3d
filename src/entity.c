@@ -133,13 +133,18 @@ void entityDraw(Entity* self)
 	if (self->draw)
 	{
 		self->draw(self);
+		
+	}
+	else
+	{
+		gfc_matrix4_from_vectors(self->mat, self->position, self->rotation, self->scale);
+
+		gf3d_model_queue_render(self->model, self->mat, self->color);
 	}
 
 	//slog("I am being drawn and my name is %s",self->name);
 	
-	gfc_matrix4_from_vectors(self->mat, self->position, self->rotation, self->scale);
 
-	gf3d_model_queue_render(self->model, self->mat, self->color);
 }
 
 void entityDrawAll()
@@ -202,4 +207,33 @@ void entityClose()
 	slog("Entity System Closed!");
 }
 
+
+void setPlayer(Entity* newPlayer)
+{
+	thePlayer = newPlayer;
+}
+
+Entity* getPlayer()
+{
+	return thePlayer;
+}
+
+
+int getFirstPersonCam()
+{
+	return firstPersonCam;
+}
+
+void swapFirstPersonCam()
+{
+	if (firstPersonCam == 1)
+		firstPersonCam = 0;
+	else
+		firstPersonCam = 1;
+}
+
+void setFirstPersonCam(int in)
+{
+	firstPersonCam = in;
+}
 

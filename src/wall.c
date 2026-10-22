@@ -19,4 +19,6 @@ Entity* spawnWall(GFC_Vector3D position, Model* model)
 	self->model = model;
 	self->position = position;
 
+	return self;
+
 }

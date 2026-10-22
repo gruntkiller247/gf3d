@@ -26,6 +26,7 @@ Level* levelNew();
 
 Level*levelLoad(const char* filename);
 
+//World.Execute(Me)
 void levelFree(Level* level);
 
 void levelDraw(Level* level);
@@ -33,8 +34,6 @@ void levelDraw(Level* level);
 Level* getLevel();
 
 Uint8 levelLineTest(Level* level, GFC_Edge3D edge, GFC_Vector3D* contactpoint);
-
-Level* getLevel();
 
 
 #endif

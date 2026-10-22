@@ -30,6 +30,9 @@ typedef struct Entity_S
 
 }Entity;
 
+static Entity* thePlayer = NULL;
+static Uint8 firstPersonCam = 0;
+
 /*
 	@brief initialize the entity manager and pre-allocate a bunch 
 	@param maxEnts how many entities can exist at any single moment
@@ -66,5 +69,12 @@ void entityThinkAll();
 void entityDrawAll();
 
 
+void setPlayer(Entity* newPlayer);
 
+Entity* getPlayer();
+
+//Returns whether the first person camera is being used or not
+int getFirstPersonCam();
+
+void setFirstPersonCam(int in);
 #endif

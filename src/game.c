@@ -24,8 +24,9 @@
 #include "model.h"
 #include "entity.h"
 #include "player.h"
-#include "level.h"
 #include "wall.h"
+#include "camera.h"
+#include "level.h"
 
 extern int __DEBUG;
 
@@ -48,7 +49,7 @@ int main(int argc,char *argv[])
     Model* model;
     Sprite *bg;
     GFC_Matrix4 mat;
-    GFC_Matrix4 *view;
+    
     GFC_Vector3D offset = { 0,-10,0 };
     Level* level;
     Entity* player;
@@ -75,11 +76,11 @@ int main(int argc,char *argv[])
     gf2d_actor_init(1000);
 
     entityInit(10000);
-    player = spawnPlayer(gfc_vector3d(0, 0, 0));
+    player = playerEntityNew(gfc_vector3d(0, 0, 0));
     
     //game init
     gfc_matrix4_identity(mat);
-    view = gf3d_vgraphics_get_view_matrix();
+   
 
     srand(SDL_GetTicks());
     slog_sync();
@@ -92,8 +93,11 @@ int main(int argc,char *argv[])
     //level = levelLoad("level/textLevel.level");
     
     //Entity* floor = entityNew(); //"models/dino/dino.json"
-    Model* floor = model_load("models/floor/floor.json"); //
+    Model* floor = model_load("models/floor/floor.json");
     Entity* wall = spawnWall(gfc_vector3d(0,0,0),floor);
+    wall->rotation = gfc_vector3d(90,0,0);
+
+    
 
     // main game loop    
     while(!_done)
@@ -109,8 +113,7 @@ int main(int argc,char *argv[])
         //Draw Sky here
 
         //3D draw
-        //Camera position, position camera is looking, what is considered up
-        gfc_matrix4_view(*view, gfc_vector3d(10, -20, 10), gfc_vector3d(0, 0, 0), gfc_vector3d(0, 0, 1));
+        
         //spin++;
         
         entityThinkAll();

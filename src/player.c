@@ -9,21 +9,21 @@
 #include "entity.h"
 #include "model.h"
 #include "level.h"
+#include "camera.h"
 
 static Level* theLevel = NULL;
 //Setup gets + setters!
 
 typedef struct
 {
-	float cameraFollowDistance;
-	GFC_Vector2D cameraRotation;
+	Entity* camera;
 	GFC_Vector3D spawn;
 
 }PlayerData;
 
 void playerFree(Entity* self);
 
-Entity* spawnPlayer(GFC_Vector3D position)
+Entity* playerEntityNew(GFC_Vector3D position)
 {
 	Entity* self;
 	self = entityNew();
@@ -51,11 +51,17 @@ Entity* spawnPlayer(GFC_Vector3D position)
 		return NULL;
 	}
 
-	data->cameraFollowDistance = 50;
-	data->cameraRotation.x = 0;
-	data->cameraRotation.y = GFC_PI/6;
-	
+	//There will be a delay on the camera system ATM Since it will think before the player!
+	data->camera = cameraEntityNew();
 
+	if (!data->camera)
+	{
+		slog("Failed to make the player's camera!");
+		return NULL;
+	}
+
+	
+	setPlayer(self);
 	strcpy(self->name, "DINOSAUR!");
 	
 	return self;
@@ -82,6 +88,7 @@ void playerThink(Entity* self)
 	GFC_Vector3D offsetEdge;
 	GFC_Edge3D edge;
 	PlayerData* data;
+	CameraData* cData;
 
 	if (!self || !self->data)
 	{
@@ -90,6 +97,7 @@ void playerThink(Entity* self)
 	}
 
 	data = (PlayerData*)self->data;
+	
 
 	if (!data)
 	{
@@ -97,34 +105,51 @@ void playerThink(Entity* self)
 		return;
 	}
 
+	/*
+	if (!cData)
+	{
+		slog("Player's Camera does not have their data!");
+	}
+	*/
+
+	cData = (CameraData*)data;
+
 	//Camera Controls
-	GFC_Matrix4* view;
-	view = gf3d_vgraphics_get_view_matrix();
+	//GFC_Matrix4* view;
+	//view = gf3d_vgraphics_get_view_matrix();
 	
-	gfc_vector3d_add(offset, self->position,offset);
-	gfc_matrix4_view(*view, offset, self->position, gfc_vector3d(0,0,1));
+	//gfc_vector3d_add(offset, self->position,offset);
+	//gfc_matrix4_view(*view, offset, self->position, gfc_vector3d(0,0,1));
 
 
 	if (gfc_input_command_down("panleft"))
 	{
-		data->cameraRotation.x += 0.05;
+		slog("left");
+		self->rotation.x += 0.05;
+		//cData->cameraRotation.x += 0.05;
 
 		//GFC_RADTODEG Human degree, computer Radians
 	}
 
 	if (gfc_input_command_down("panright"))
 	{
-		data->cameraRotation.x -= 0.05;
+		slog("right");
+		self->rotation.x -= 0.05;
+		//cData->cameraRotation.x -= 0.05;
 	}
 
 	if (gfc_input_command_down("panup"))
 	{
-		data->cameraRotation.y += 0.05;
+		slog("up");
+		self->rotation.y += 0.05;
+		//cData->cameraRotation.y += 0.05;
 	}
 
 	if (gfc_input_command_down("pandown"))
 	{
-		data->cameraRotation.y -= 0.05;
+		slog("down");
+		self->rotation.y -= 0.05;
+		//cData->cameraRotation.y -= 0.05;
 	}
 
 
@@ -151,7 +176,11 @@ void playerThink(Entity* self)
 	}
 
 
-
+	if (gfc_input_key_pressed("z"))
+	{
+		slog("Swapping cameras!");
+		swapFirstPersonCam();
+	}
 	
 	
 	/*
@@ -178,7 +207,7 @@ void playerThink(Entity* self)
 	{
 		gfc_vector3d_normalize(&move);
 
-		gfc_vector3d_rotate_about_z(&move, data->cameraRotation.x);
+		gfc_vector3d_rotate_about_z(&move, cData->cameraRotation.x);
 
 
 		self->velocity = move;
@@ -187,13 +216,13 @@ void playerThink(Entity* self)
 	//Player Camera Update - Done in Think, Yeah! I KNOW!
 	gfc_vector3d_add(self->position, self->position, self->velocity);
 
-	gfc_vector3d_scale(offset, offset, data->cameraFollowDistance);
-	gfc_vector3d_rotate_about_z(&offset,data->cameraRotation.x);
+	gfc_vector3d_scale(offset, offset, cData->cameraFollowDistance);
+	gfc_vector3d_rotate_about_z(&offset, cData->cameraRotation.x);
 
-	self->rotation.z = data->cameraRotation.x;
+	self->rotation.z = cData->cameraRotation.x;
 
-	gfc_vector3d_rotate_about_x(&offset, data->cameraRotation.y);
-	self->rotation.y = data->cameraRotation.y;
+	gfc_vector3d_rotate_about_x(&offset, cData->cameraRotation.y);
+	self->rotation.y = cData->cameraRotation.y;	
 
 	if (gfc_vector3d_magnitude_squared(self->velocity) < 0.1)
 	{

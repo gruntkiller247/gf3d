@@ -4,9 +4,10 @@
 #include "entity.h"
 
 
-Entity* spawnPlayer(GFC_Vector3D position);
+Entity* playerEntityNew(GFC_Vector3D position);
 
 void playerThink(Entity* self);
+
 void playerUpdate(Entity* self);
 
 

@@ -394,7 +394,7 @@ void gf3d_model_queue_render(Model* model,GFC_Matrix4 mat,GFC_Color colormod)
 {
 	if (!model)
 	{
-		slog("No model to render!");
+		//slog("No model to render!");
 		return;
 	}
 		
