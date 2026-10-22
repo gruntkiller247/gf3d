@@ -20,10 +20,10 @@ typedef struct Entity_S
 	GFC_Vector3D	velocity;
 	GFC_Color		color;
 	
-	int		(*think)(struct Entity_S* self);	
-	int		(*update)(struct Entity_S* self);
-	int		(*draw)(struct Entity_S* self);
-	int		(*free)(struct Entity_S* self);		
+	void		(*think)(struct Entity_S* self);	
+	void		(*update)(struct Entity_S* self);
+	void		(*draw)(struct Entity_S* self);
+	void		(*free)(struct Entity_S* self);		
 	void*	data;								//Used for custom data. Must create a free function for it!
 
 	GFC_TextLine	name;

@@ -6,8 +6,8 @@
 
 Entity* spawnPlayer(GFC_Vector3D position);
 
-int playerThink(Entity* self);
-int playerUpdate(Entity* self);
+void playerThink(Entity* self);
+void playerUpdate(Entity* self);
 
 
 

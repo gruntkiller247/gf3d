@@ -27,6 +27,7 @@ Entity* spawnPlayer(GFC_Vector3D position)
 {
 	Entity* self;
 	self = entityNew();
+	PlayerData* data;
 
 	if (!self)
 	{	
@@ -42,14 +43,18 @@ Entity* spawnPlayer(GFC_Vector3D position)
 	self->data = gfc_allocate_array(sizeof(PlayerData), 1);
 	self->free = playerFree;
 
-	PlayerData* data = (PlayerData*)self->data;
+	data = (PlayerData*)self->data;
 
-	if (data)
+	if (!data)
 	{
-		data->cameraFollowDistance = 50;
-		data->cameraRotation.x = 0;
-		data->cameraRotation.y = GFC_PI/6;
+		slog("Failed to make Player Data!");
+		return NULL;
 	}
+
+	data->cameraFollowDistance = 50;
+	data->cameraRotation.x = 0;
+	data->cameraRotation.y = GFC_PI/6;
+	
 
 	strcpy(self->name, "DINOSAUR!");
 	
@@ -69,7 +74,7 @@ void playerFree(Entity* self)
 	self->data = NULL;
 }
 
-int playerThink(Entity* self)
+void playerThink(Entity* self)
 {
 	GFC_Vector3D move = { 0 };
 	GFC_Vector3D floor;
@@ -199,11 +204,9 @@ int playerThink(Entity* self)
 		//slog("Clearing!");
 		gfc_vector3d_clear(self->velocity);
 	}
-
-	return 1;
 }
 
-int playerUpdate(Entity* self)
+void playerUpdate(Entity* self)
 {
 	
 	if (!self || !self->data)
@@ -216,5 +219,5 @@ int playerUpdate(Entity* self)
 
 	//gfc_input_key_pressed();
 	
-	return 1;
+	
 }

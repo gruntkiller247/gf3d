@@ -80,11 +80,7 @@ void entityUpdate(Entity* self)
 
 	if (self->update)
 	{
-		if (self->update(self) == 1)
-		{
-			
-			return;
-		}
+		self->update(self);
 	}
 }
 
@@ -109,10 +105,7 @@ void entityThink(Entity* self)
 
 	if (self->think)
 	{
-		if (self->think(self) == 1)
-		{
-			return;
-		}
+		self->think(self);
 	}
 }
 
@@ -139,10 +132,7 @@ void entityDraw(Entity* self)
 
 	if (self->draw)
 	{
-		if (self->draw(self) == 1)
-		{
-			return;
-		}
+		self->draw(self);
 	}
 
 	//slog("I am being drawn and my name is %s",self->name);

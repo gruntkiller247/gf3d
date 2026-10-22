@@ -198,6 +198,9 @@
     <ClInclude Include="..\include\wall.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\monster.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\game.c">
@@ -366,6 +369,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\wall.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\monster.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
