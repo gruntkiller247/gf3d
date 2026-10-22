@@ -64,6 +64,7 @@ Entity* entityNew()
 		entityManager.entityList[c]._inUse = 1;
 		entityManager.entityList[c].scale = gfc_vector3d(1,1,1);
 		entityManager.entityList[c].color = GFC_COLOR_WHITE;
+		//entityManager.entityList[c].model = "models/dino/dino.json"; //"models/floor/floor.json";
 
 		return &entityManager.entityList[c];
 	}

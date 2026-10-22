@@ -25,6 +25,7 @@
 #include "entity.h"
 #include "player.h"
 #include "level.h"
+#include "wall.h"
 
 extern int __DEBUG;
 
@@ -90,6 +91,9 @@ int main(int argc,char *argv[])
     //Level Stuff
     //level = levelLoad("level/textLevel.level");
     
+    //Entity* floor = entityNew(); //"models/dino/dino.json"
+    Model* floor = model_load("models/floor/floor.json"); //
+    Entity* wall = spawnWall(gfc_vector3d(0,0,0),floor);
 
     // main game loop    
     while(!_done)

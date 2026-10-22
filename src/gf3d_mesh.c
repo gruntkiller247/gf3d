@@ -39,8 +39,10 @@ Mesh* gf3d_mesh_get_by_filename(const char* fileName)
         if (strlen(meshManager.meshList[c].filename) == 0 || meshManager.meshList[c]._refCount == 0)
             continue;
 
-        if (gfc_strlcmp(meshManager.meshList[c].filename,fileName))
+        if (gfc_strlcmp(meshManager.meshList[c].filename,fileName)  == 0)
         {
+            slog("Found a mesh in use! %s", meshManager.meshList[c].filename);
+            slog("Other filename: %s", fileName);
             return &meshManager.meshList[c];
         }
     }
@@ -264,7 +266,7 @@ int gf3d_prim_buffer_create(MeshPrimitive* prim)
     bufferSize = (sizeof(Face) * prim->objData->face_count);
     gf3d_buffer_create(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, &stagingBuffer, &stagingBufferMemory);
 
-    vkMapMemory(meshManager.device, stagingBufferMemory, 0, bufferSize, 0, &data) != VK_SUCCESS;
+    vkMapMemory(meshManager.device, stagingBufferMemory, 0, bufferSize, 0, &data);
     memcpy(data, prim->objData->outFace, (size_t)bufferSize);
     vkUnmapMemory(meshManager.device, stagingBufferMemory);
 
@@ -312,7 +314,7 @@ Mesh* gf3d_mesh_load_obj(const char* filename)
     
     if (mesh)
     {
-        slog("Found a mesh by filename!");
+        slog("Found a mesh by filename! %s",filename);
         mesh->_refCount++;
         return mesh;
     }

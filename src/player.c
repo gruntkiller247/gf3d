@@ -76,6 +76,7 @@ int playerThink(Entity* self)
 	GFC_Vector3D offset = { 0,-50,0 };
 	GFC_Vector3D offsetEdge;
 	GFC_Edge3D edge;
+	PlayerData* data;
 
 	if (!self || !self->data)
 	{
@@ -83,16 +84,21 @@ int playerThink(Entity* self)
 		return NULL;
 	}
 
+	data = (PlayerData*)self->data;
+
+	if (!data)
+	{
+		slog("Player does not have their data!");
+		return;
+	}
+
+	//Camera Controls
 	GFC_Matrix4* view;
 	view = gf3d_vgraphics_get_view_matrix();
 	
-
-	
 	gfc_vector3d_add(offset, self->position,offset);
-	
 	gfc_matrix4_view(*view, offset, self->position, gfc_vector3d(0,0,1));
 
-	PlayerData* data = (PlayerData*)self->data;
 
 	if (gfc_input_command_down("panleft"))
 	{
@@ -117,8 +123,8 @@ int playerThink(Entity* self)
 	}
 
 
-
-
+	
+	//Player Movement
 	if (gfc_input_command_down("item_up"))
 	{
 		move.y = 1;
@@ -141,15 +147,16 @@ int playerThink(Entity* self)
 
 
 
-	offset = gfc_vector3d(0, 0, 100);
 	
+	
+	/*
 	
 	gfc_vector3d_add(offsetEdge.x,self->position,offset);
 	gfc_vector3d_add(offsetEdge.y, self->position, offset);
 	gfc_vector3d_add(offsetEdge.z, self->position, offset);
 
 	
-
+	
 	edge = gfc_edge3d(self->position.x, self->position.y, self->position.z, );
 
 	if (levelLineTest(getLevel(), edge, &floor))
@@ -158,10 +165,10 @@ int playerThink(Entity* self)
 	}
 
 
-
+	*/
 	
 
-
+	//Player Movement Update - Done in Think, yeah I know!
 	if ((move.x) || (move.y))
 	{
 		gfc_vector3d_normalize(&move);
@@ -171,6 +178,8 @@ int playerThink(Entity* self)
 
 		self->velocity = move;
 	}
+
+	//Player Camera Update - Done in Think, Yeah! I KNOW!
 	gfc_vector3d_add(self->position, self->position, self->velocity);
 
 	gfc_vector3d_scale(offset, offset, data->cameraFollowDistance);

@@ -1,0 +1,7 @@
+{
+  "model": 
+  {
+    "obj": "models/floor/3D_Game_Floor.obj",
+    "texture": "models/floor/floor.png"
+   }
+}
