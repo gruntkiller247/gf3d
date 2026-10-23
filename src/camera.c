@@ -33,9 +33,12 @@ Entity* cameraEntityNew()
 		return NULL;
 	}
 
-	data->cameraFollowDistance = 1;
+	data->cameraFollowDistance = 50;
 	data->cameraRotation.x = 0;
 	data->cameraRotation.y = GFC_PI / 6;
+	data->cameraOffset = gfc_vector3d(0, -50, 0);
+	data->originalCameraOffset = data->cameraOffset;
+	
 
 	self->data = data;
 
@@ -64,6 +67,37 @@ void cameraThink(Entity* self)
 		slog("Failed to find Camera's Data!");
 		return NULL;
 	}
+
+	player = getPlayer();
+
+	if (!player)
+	{
+		slog("Camera cannot find the player!");
+		return;
+	}
+
+	data->cameraOffset = data->originalCameraOffset;
+	
+	view = gf3d_vgraphics_get_view_matrix();
+
+	gfc_vector3d_add(data->cameraOffset, player->position, data->cameraOffset);
+	gfc_matrix4_view(*view, data->cameraOffset, player->position, gfc_vector3d(0, 0, 1));
+	
+
+
+	
+	//Camera Update?
+	gfc_vector3d_add(self->position, self->position, self->velocity);
+
+	gfc_vector3d_scale(data->cameraOffset, data->cameraOffset, data->cameraFollowDistance);
+	gfc_vector3d_rotate_about_z(&data->cameraOffset, data->cameraRotation.x);
+
+	self->rotation.z = data->cameraRotation.x;
+
+	gfc_vector3d_rotate_about_x(&data->cameraOffset, data->cameraRotation.y);
+	self->rotation.y = data->cameraRotation.y;
+
+	/*
 	
 	
 	view = gf3d_vgraphics_get_view_matrix();
@@ -76,7 +110,7 @@ void cameraThink(Entity* self)
 	data->cameraRotation = player->rotation;
 	
 	
-	/*
+	
 
 	gfc_vector3d_scale(offset, offset, cData->cameraFollowDistance);
 	gfc_vector3d_rotate_about_z(&offset, cData->cameraRotation.x);

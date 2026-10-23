@@ -445,8 +445,6 @@ void gf3d_mesh_queue_render(Mesh* mesh, Pipeline* pipe, void* uboData, Texture* 
         if (!prim)
             continue;
 
-        slog("Vertex count: %i",prim->vertexCount);
-        slog("Face count: %i", prim->faceCount);
         gf3d_pipeline_queue_render(pipe,prim->vertexBuffer,prim->vertexCount,prim->faceBuffer,uboData,texture);
     }
     

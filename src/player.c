@@ -17,7 +17,6 @@ static Level* theLevel = NULL;
 typedef struct
 {
 	Entity* camera;
-	GFC_Vector3D spawn;
 
 }PlayerData;
 
@@ -26,8 +25,10 @@ void playerFree(Entity* self);
 Entity* playerEntityNew(GFC_Vector3D position)
 {
 	Entity* self;
-	self = entityNew();
+	Entity* camera;
 	PlayerData* data;
+
+	self = entityNew();
 
 	if (!self)
 	{	
@@ -51,7 +52,8 @@ Entity* playerEntityNew(GFC_Vector3D position)
 		return NULL;
 	}
 
-	//There will be a delay on the camera system ATM Since it will think before the player!
+
+	//Camera needs to think after the player!
 	data->camera = cameraEntityNew();
 
 	if (!data->camera)
@@ -84,11 +86,9 @@ void playerThink(Entity* self)
 {
 	GFC_Vector3D move = { 0 };
 	GFC_Vector3D floor;
-	GFC_Vector3D offset = { 0,-50,0 };
 	GFC_Vector3D offsetEdge;
 	GFC_Edge3D edge;
 	PlayerData* data;
-	CameraData* cData;
 
 	if (!self || !self->data)
 	{
@@ -104,22 +104,9 @@ void playerThink(Entity* self)
 		slog("Player does not have their data!");
 		return;
 	}
-
-	/*
-	if (!cData)
-	{
-		slog("Player's Camera does not have their data!");
-	}
-	*/
-
-	cData = (CameraData*)data;
-
-	//Camera Controls
-	//GFC_Matrix4* view;
-	//view = gf3d_vgraphics_get_view_matrix();
 	
-	//gfc_vector3d_add(offset, self->position,offset);
-	//gfc_matrix4_view(*view, offset, self->position, gfc_vector3d(0,0,1));
+
+	
 
 
 	if (gfc_input_command_down("panleft"))
@@ -209,13 +196,12 @@ void playerThink(Entity* self)
 	{
 		gfc_vector3d_normalize(&move);
 
-		gfc_vector3d_rotate_about_z(&move, cData->cameraRotation.x);
+		//gfc_vector3d_rotate_about_z(&move, cData->cameraRotation.x);
 
 
 		self->velocity = move;
 	}
 
-	
 
 	if (gfc_vector3d_magnitude_squared(self->velocity) < 0.1)
 	{
