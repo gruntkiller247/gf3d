@@ -77,4 +77,5 @@ Entity* getPlayer();
 int getFirstPersonCam();
 
 void setFirstPersonCam(int in);
+void swapFirstPersonCam();
 #endif

@@ -124,7 +124,7 @@ void playerThink(Entity* self)
 
 	if (gfc_input_command_down("panleft"))
 	{
-		slog("left");
+		//slog("left");
 		self->rotation.x += 0.05;
 		//cData->cameraRotation.x += 0.05;
 
@@ -133,21 +133,22 @@ void playerThink(Entity* self)
 
 	if (gfc_input_command_down("panright"))
 	{
-		slog("right");
+		//slog("right");
 		self->rotation.x -= 0.05;
 		//cData->cameraRotation.x -= 0.05;
 	}
 
 	if (gfc_input_command_down("panup"))
 	{
-		slog("up");
+		//slog("up");
 		self->rotation.y += 0.05;
 		//cData->cameraRotation.y += 0.05;
 	}
 
 	if (gfc_input_command_down("pandown"))
 	{
-		slog("down");
+		//slog("down");
+		
 		self->rotation.y -= 0.05;
 		//cData->cameraRotation.y -= 0.05;
 	}
@@ -201,6 +202,7 @@ void playerThink(Entity* self)
 
 	*/
 	
+	gfc_vector3d_add(self->position, self->position, self->velocity);
 
 	//Player Movement Update - Done in Think, yeah I know!
 	if ((move.x) || (move.y))
@@ -213,16 +215,7 @@ void playerThink(Entity* self)
 		self->velocity = move;
 	}
 
-	//Player Camera Update - Done in Think, Yeah! I KNOW!
-	gfc_vector3d_add(self->position, self->position, self->velocity);
-
-	gfc_vector3d_scale(offset, offset, cData->cameraFollowDistance);
-	gfc_vector3d_rotate_about_z(&offset, cData->cameraRotation.x);
-
-	self->rotation.z = cData->cameraRotation.x;
-
-	gfc_vector3d_rotate_about_x(&offset, cData->cameraRotation.y);
-	self->rotation.y = cData->cameraRotation.y;	
+	
 
 	if (gfc_vector3d_magnitude_squared(self->velocity) < 0.1)
 	{

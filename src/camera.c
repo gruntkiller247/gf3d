@@ -65,7 +65,7 @@ void cameraThink(Entity* self)
 		return NULL;
 	}
 	
-
+	
 	view = gf3d_vgraphics_get_view_matrix();
 	player = getPlayer();
 
@@ -75,8 +75,24 @@ void cameraThink(Entity* self)
 
 	data->cameraRotation = player->rotation;
 	
+	
+	/*
+
+	gfc_vector3d_scale(offset, offset, cData->cameraFollowDistance);
+	gfc_vector3d_rotate_about_z(&offset, cData->cameraRotation.x);
+
+	self->rotation.z = cData->cameraRotation.x;
+
+	gfc_vector3d_rotate_about_x(&offset, cData->cameraRotation.y);
+	self->rotation.y = cData->cameraRotation.y;
+
+	*/
+	
+
+	/*
 	if (!getFirstPersonCam())
 	{
+		//Player rotation * X
 		//cameraFollowDistance
 		//				out mat		Camera position, position camera is looking,		what is considered up
 		gfc_matrix4_view(*view, player->position, gfc_vector3d(x, y, z), gfc_vector3d(0, 0, 1));
@@ -86,6 +102,8 @@ void cameraThink(Entity* self)
 		gfc_matrix4_view(*view, gfc_vector3d(10, -20, 10), gfc_vector3d(x, y, z), gfc_vector3d(0, 0, 1));
 		slog("Not first person camera");
 	}
+
+	*/
 
 
 }
