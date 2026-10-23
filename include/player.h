@@ -3,6 +3,12 @@
 
 #include "entity.h"
 
+typedef struct Player_S
+{
+	Entity* camera;
+	GFC_Vector2D playerRotation;
+
+}PlayerData;
 
 Entity* playerEntityNew(GFC_Vector3D position);
 

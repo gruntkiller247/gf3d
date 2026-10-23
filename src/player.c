@@ -14,11 +14,7 @@
 static Level* theLevel = NULL;
 //Setup gets + setters!
 
-typedef struct
-{
-	Entity* camera;
 
-}PlayerData;
 
 void playerFree(Entity* self);
 
@@ -36,13 +32,14 @@ Entity* playerEntityNew(GFC_Vector3D position)
 		return NULL;
 	}
 
-	self->model = model_load("models/dino/dino.model");
+	//self->model = model_load("models/dino/dino.model");
 	self->position = position;
 	self->think = playerThink;
 	self->update = playerUpdate;
 
 	self->data = gfc_allocate_array(sizeof(PlayerData), 1);
 	self->free = playerFree;
+
 
 	data = (PlayerData*)self->data;
 
@@ -55,6 +52,8 @@ Entity* playerEntityNew(GFC_Vector3D position)
 
 	//Camera needs to think after the player!
 	data->camera = cameraEntityNew();
+	data->playerRotation.x = 0;
+	data->playerRotation.y = GFC_PI / 6;
 
 	if (!data->camera)
 	{
@@ -127,36 +126,23 @@ void playerThink(Entity* self)
 
 	if (gfc_input_command_down("panleft"))
 	{
-		//slog("left");
-		self->rotation.x += 0.05;
-		//cData->cameraRotation.x += 0.05;
-
-		//GFC_RADTODEG Human degree, computer Radians
+		data->playerRotation.x += 0.05;
 	}
 
 	if (gfc_input_command_down("panright"))
 	{
-		//slog("right");
-		self->rotation.x -= 0.05;
-		//cData->cameraRotation.x -= 0.05;
-	}
-
-	if (gfc_input_command_down("panup"))
-	{
-		//slog("up");
-		self->rotation.y += 0.05;
-		//cData->cameraRotation.y += 0.05;
+		data->playerRotation.x -= 0.05;
 	}
 
 	if (gfc_input_command_down("pandown"))
 	{
-		//slog("down");
-		
-		self->rotation.y -= 0.05;
-		//cData->cameraRotation.y -= 0.05;
+		data->playerRotation.y += 0.05;
 	}
 
-
+	if (gfc_input_command_down("panup"))
+	{
+		data->playerRotation.y -= 0.05;
+	}
 	
 	//Player Movement
 	if (gfc_input_command_down("item_up"))
@@ -187,7 +173,7 @@ void playerThink(Entity* self)
 	{
 		gfc_vector3d_normalize(&move);
 
-		gfc_vector3d_rotate_about_z(&move, cData->cameraRotation.x);
+		gfc_vector3d_rotate_about_z(&move, data->playerRotation.x);
 
 
 		self->velocity = move;
@@ -196,12 +182,12 @@ void playerThink(Entity* self)
 	gfc_vector3d_add(self->position, self->position, self->velocity);
 
 	gfc_vector3d_scale(offset, offset, cData->cameraFollowDistance);
-	gfc_vector3d_rotate_about_z(&offset, cData->cameraRotation.x);
+	gfc_vector3d_rotate_about_z(&offset, data->playerRotation.x);
 
-	self->rotation.z = cData->cameraRotation.x;
+	self->rotation.z = data->playerRotation.x;
 
-	gfc_vector3d_rotate_about_x(&offset, cData->cameraRotation.y);
-	self->rotation.y = cData->cameraRotation.y;
+	gfc_vector3d_rotate_about_x(&offset, data->playerRotation.y);
+	self->rotation.y = data->playerRotation.y;
 
 	if (gfc_vector3d_magnitude_squared(self->velocity) < 0.1)
 	{
