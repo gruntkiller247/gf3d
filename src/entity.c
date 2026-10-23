@@ -65,7 +65,7 @@ Entity* entityNew()
 		entityManager.entityList[c].scale = gfc_vector3d(1,1,1);
 		entityManager.entityList[c].color = GFC_COLOR_WHITE;
 		//entityManager.entityList[c].model = "models/dino/dino.json"; //"models/floor/floor.json";
-
+		entityManager.entityList[c].directionLooking = 0;
 		return &entityManager.entityList[c];
 	}
 }
@@ -228,4 +228,7 @@ Entity* getCamera()
 {
 	return theCamera;
 }
+
+
+
 

@@ -52,7 +52,7 @@ void cameraThink(Entity* self)
     PlayerData* pData;
     CameraData* data;
     GFC_Vector3D offset;
-    GFC_Vector3D cameraPosition;
+	GFC_Vector3D cameraPosition;
 
     if (!self || !self->data)
     {
@@ -72,21 +72,33 @@ void cameraThink(Entity* self)
 
     pData = (PlayerData*)player->data;
 
+	
 	float yaw = pData->playerRotation.x;
 	float pitch = pData->playerRotation.y;
 	float distance = data->cameraFollowDistance;
 
-	// Calculate the camera's horizontal distance and height
+	//Calculate the camera's horizontal distance and height
 	offset.x = distance * cosf(pitch) * sinf(yaw);
 	offset.y = -distance * cosf(pitch) * cosf(yaw);
 	offset.z = distance * sinf(pitch);
 
-	// Place the camera relative to the player
+	//Place the camera relative to the player
 	gfc_vector3d_add(cameraPosition,player->position,offset);
+	
+
+	/*
+	//PlayerRotation.x is an angle need to make a vector
+	//Same with Y
+
+	offset.x = pData->playerRotation.x;
+	offset.y = pData->playerRotation.y;
+	offset.z = data->cameraFollowDistance;
+
+	gfc_vector3d_add(offset, player->position, offset);
+	*/
 
 	view = gf3d_vgraphics_get_view_matrix();
-
-	gfc_matrix4_view(*view,cameraPosition,player->position,gfc_vector3d(0, 0, 1));
+	gfc_matrix4_view(*view, cameraPosition, player->position, gfc_vector3d(0, 0, 1));
 }
 
 void cameraDraw(Entity* self)

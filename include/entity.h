@@ -4,6 +4,15 @@
 #include "model.h"
 #include "gfc_color.h"
 
+typedef enum
+{
+	LD_North = 0,
+	LD_East,
+	LD_South,
+	LD_West,
+	LD_ERROR = -1
+
+}LookingDirections;
 
 
 typedef struct Entity_S
@@ -27,6 +36,7 @@ typedef struct Entity_S
 	void*	data;								//Used for custom data. Must create a free function for it!
 
 	GFC_TextLine	name;
+	Uint8 directionLooking;
 
 }Entity;
 
@@ -77,5 +87,5 @@ void setCamera(Entity* newCam);
 
 Entity* getCamera();
 
-
+int checkLookingDirection(Entity* self);
 #endif

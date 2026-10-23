@@ -114,7 +114,7 @@ int main(int argc,char *argv[])
 
         //3D draw
         
-        //spin++;
+        //slog("Mouse X: %f\nMouse Y: %f", gf2d_mouse_get_position().x, gf2d_mouse_get_position().y);
         
         entityThinkAll();
         entityUpdateAll();

@@ -16,6 +16,8 @@ static Level* theLevel = NULL;
 
 
 
+
+
 void playerFree(Entity* self);
 
 Entity* playerEntityNew(GFC_Vector3D position)
@@ -52,15 +54,23 @@ Entity* playerEntityNew(GFC_Vector3D position)
 
 	//Camera needs to think after the player!
 	data->camera = cameraEntityNew();
-	data->playerRotation.x = 0;
-	data->playerRotation.y = GFC_PI / 6;
+	
 
 	if (!data->camera)
 	{
 		slog("Failed to make the player's camera!");
 		return NULL;
 	}
+	
+	/*
+	data->camera->position.x = self->position.x;
+	data->camera->position.y = self->position.y;
+	data->camera->position.z = self->position.z;
+	*/
 
+	data->playerRotation.x = 0;
+	data->playerRotation.y = GFC_PI / 6;
+	data->panSpeed = 0.05f;
 	
 	setPlayer(self);
 	strcpy(self->name, "DINOSAUR!");
@@ -126,23 +136,60 @@ void playerThink(Entity* self)
 
 	if (gfc_input_command_down("panleft"))
 	{
-		data->playerRotation.x += 0.05;
+		if (data->playerRotation.x + data->panSpeed >= 2* GFC_PI)
+		{
+			//Player is doing the hookie pookie and turning around!
+			data->playerRotation.x = 0;
+		}
+		else
+		{
+			//Player is mid hookie pookie!
+			data->playerRotation.x += data->panSpeed;
+		}
+		
 	}
 
 	if (gfc_input_command_down("panright"))
 	{
-		data->playerRotation.x -= 0.05;
+		if (data->playerRotation.x - data->panSpeed <= 0)
+		{
+			//Player is doing the hookie pookie and turning around!
+			data->playerRotation.x = 2* GFC_PI;
+		}
+		else
+		{
+			//Player is mid hookie pookie!
+			data->playerRotation.x -= data->panSpeed;
+		}
 	}
 
 	if (gfc_input_command_down("pandown"))
 	{
-		data->playerRotation.y += 0.05;
+		if (data->playerRotation.y + data->panSpeed >= GFC_PI / 2)
+		{
+			//Do not let happen
+		}
+		else
+		{
+			data->playerRotation.y += data->panSpeed;
+		}
+		
 	}
 
 	if (gfc_input_command_down("panup"))
 	{
-		data->playerRotation.y -= 0.05;
+		if (data->playerRotation.y - data->panSpeed <= -1*(GFC_PI / 2))
+		{
+			//Do not let happen
+		}
+		else
+		{
+			data->playerRotation.y -= data->panSpeed;
+		}
+		
 	}
+
+	slog("\nPlayerRotation x: %f\nPlayerRotation y: %f", data->playerRotation.x, data->playerRotation.y);
 	
 	//Player Movement
 	if (gfc_input_command_down("item_up"))
@@ -165,7 +212,7 @@ void playerThink(Entity* self)
 		move.x = -1;
 	}
 	
-	gfc_vector3d_add(self->position, self->position, self->velocity);
+
 	GFC_Vector3D offset = gfc_vector3d(0, 0, 100);
 
 	//Player Movement Update - Done in Think, yeah I know!
@@ -198,6 +245,8 @@ void playerThink(Entity* self)
 		//slog("Clearing!");
 		gfc_vector3d_clear(self->velocity);
 	}
+
+	slog("\nPlayer's spacial position x: %f\nPlayer's spacial position y: %f",self->position.x,self->position.y);
 }
 
 void playerUpdate(Entity* self)
@@ -212,6 +261,32 @@ void playerUpdate(Entity* self)
 
 
 	//gfc_input_key_pressed();
+}
+
+/*
+	Returns the entity's current looking direction derived from Radian math around them
+	Or returns the enum for bad direction!
+*/
+int checkLookingDirection(Entity* self)
+{
+	float rotX;
+	PlayerData* data;
+	if (!self || !self->data)
+	{
+		return;
+	}
+	data = (PlayerData*)self->data;
 	
-	
+	if (!data)
+	{
+		return;
+	}
+
+	rotX = data->playerRotation.x;
+
+	//Check North
+	//if ()
+	{
+
+	}
 }
