@@ -89,6 +89,8 @@ void playerThink(Entity* self)
 	GFC_Vector3D offsetEdge;
 	GFC_Edge3D edge;
 	PlayerData* data;
+	Entity* camera;
+	CameraData* cData;
 
 	if (!self || !self->data)
 	{
@@ -106,7 +108,21 @@ void playerThink(Entity* self)
 	}
 	
 
-	
+	camera = getCamera();
+
+	if (!camera)
+	{
+		slog("The Player could not find the camera!");
+		return;
+	}
+
+	cData = (CameraData*)camera->data;
+
+	if (!cData)
+	{
+		slog("Player failed to find the camera's data!");
+		return;
+	}
 
 
 	if (gfc_input_command_down("panleft"))
@@ -162,46 +178,30 @@ void playerThink(Entity* self)
 	{
 		move.x = -1;
 	}
-
-
-	if (gfc_input_key_pressed("z"))
-	{
-		slog("Swapping cameras!");
-		swapFirstPersonCam();
-	}
-	
-	
-	/*
-	
-	gfc_vector3d_add(offsetEdge.x,self->position,offset);
-	gfc_vector3d_add(offsetEdge.y, self->position, offset);
-	gfc_vector3d_add(offsetEdge.z, self->position, offset);
-
-	
-	
-	edge = gfc_edge3d(self->position.x, self->position.y, self->position.z, );
-
-	if (levelLineTest(getLevel(), edge, &floor))
-	{
-		self->position.z = floor.z + 7; //7 is some number from the player model
-	}
-
-
-	*/
 	
 	gfc_vector3d_add(self->position, self->position, self->velocity);
+	GFC_Vector3D offset = gfc_vector3d(0, 0, 100);
 
 	//Player Movement Update - Done in Think, yeah I know!
 	if ((move.x) || (move.y))
 	{
 		gfc_vector3d_normalize(&move);
 
-		//gfc_vector3d_rotate_about_z(&move, cData->cameraRotation.x);
+		gfc_vector3d_rotate_about_z(&move, cData->cameraRotation.x);
 
 
 		self->velocity = move;
 	}
 
+	gfc_vector3d_add(self->position, self->position, self->velocity);
+
+	gfc_vector3d_scale(offset, offset, cData->cameraFollowDistance);
+	gfc_vector3d_rotate_about_z(&offset, cData->cameraRotation.x);
+
+	self->rotation.z = cData->cameraRotation.x;
+
+	gfc_vector3d_rotate_about_x(&offset, cData->cameraRotation.y);
+	self->rotation.y = cData->cameraRotation.y;
 
 	if (gfc_vector3d_magnitude_squared(self->velocity) < 0.1)
 	{

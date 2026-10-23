@@ -218,22 +218,14 @@ Entity* getPlayer()
 	return thePlayer;
 }
 
-
-int getFirstPersonCam()
+void setCamera(Entity* newCam)
 {
-	return firstPersonCam;
+	theCamera = newCam;
 }
 
-void swapFirstPersonCam()
-{
-	if (firstPersonCam == 1)
-		firstPersonCam = 0;
-	else
-		firstPersonCam = 1;
-}
 
-void setFirstPersonCam(int in)
+Entity* getCamera()
 {
-	firstPersonCam = in;
+	return theCamera;
 }
 

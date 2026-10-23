@@ -31,7 +31,7 @@ typedef struct Entity_S
 }Entity;
 
 static Entity* thePlayer = NULL;
-static Uint8 firstPersonCam = 0;
+static Entity* theCamera = NULL;
 
 /*
 	@brief initialize the entity manager and pre-allocate a bunch 
@@ -73,9 +73,9 @@ void setPlayer(Entity* newPlayer);
 
 Entity* getPlayer();
 
-//Returns whether the first person camera is being used or not
-int getFirstPersonCam();
+void setCamera(Entity* newCam);
 
-void setFirstPersonCam(int in);
-void swapFirstPersonCam();
+Entity* getCamera();
+
+
 #endif

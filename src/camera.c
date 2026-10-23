@@ -42,6 +42,8 @@ Entity* cameraEntityNew()
 
 	self->data = data;
 
+	setCamera(self);
+
 	return self;
 }
 
