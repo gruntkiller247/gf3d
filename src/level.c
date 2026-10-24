@@ -67,9 +67,9 @@ Level* levelLoad(const char* filename)
 	}
 	else
 	{
-		slog("Failed to find skybox for level! Make sure to remove the fail if you do not have skyboxs implmented!");
+		slog("Failed to find skybox for level! Make sure to add the fail if you do not have skyboxs implmented!");
 		
-		goto fail;
+		//goto fail;
 	}
 
 	str = sj_object_get_string(data, "terrain");
@@ -77,6 +77,7 @@ Level* levelLoad(const char* filename)
 	if (str)
 	{
 		//Do Terrain stuff!
+		//Drunkard walking!
 	}
 
 	str = sj_object_get_string(data, "music");

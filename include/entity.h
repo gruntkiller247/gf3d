@@ -14,12 +14,24 @@ typedef enum
 
 }LookingDirections;
 
+typedef enum
+{
+	TEAM_NONE,
+	TEAM_PLAYER,
+	TEAM_WALL,
+	TEAM_ENEMY,
+	TEAM_IGNORE,
+	TEAM_ITEM
+}Teams;
+
 
 typedef struct Entity_S
 {
 	Uint8			_inUse;
 	Model			*model;
 	GFC_Matrix4		mat;
+	Uint32			layer;
+	Uint8			team;
 	
 
 	GFC_Vector3D	position;
@@ -32,7 +44,8 @@ typedef struct Entity_S
 	void		(*think)(struct Entity_S* self);	
 	void		(*update)(struct Entity_S* self);
 	void		(*draw)(struct Entity_S* self);
-	void		(*free)(struct Entity_S* self);		
+	void		(*free)(struct Entity_S* self);
+	void		(*touch)(struct Entity_S* self, struct Entity_S* toucher);
 	void*	data;								//Used for custom data. Must create a free function for it!
 
 	GFC_TextLine	name;
@@ -49,19 +62,16 @@ static Entity* theCamera = NULL;
 */
 void entityInit(Uint32 maxEnts);
 
-
 /*
 	@breif get a blank entity from the system
 	@return NULL on error or out of memory, a valid pointer otherwise
 */
 Entity * entityNew();
 
-
 /*
 	@brief call to clean up an entity after it is no longer needed
 */
 void entityFree(Entity* self);
-
 
 /*
 	@brief run updates on all active entities
@@ -78,6 +88,8 @@ void entityThinkAll();
 */
 void entityDrawAll();
 
+void entityTouchAll();
+
 
 void setPlayer(Entity* newPlayer);
 
@@ -86,6 +98,8 @@ Entity* getPlayer();
 void setCamera(Entity* newCam);
 
 Entity* getCamera();
+
+void hitWall(Entity* toucher);
 
 int checkLookingDirection(Entity* self);
 #endif

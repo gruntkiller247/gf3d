@@ -19,6 +19,7 @@ static Level* theLevel = NULL;
 
 
 void playerFree(Entity* self);
+void playerTouch(Entity* self, Entity* toucher);
 
 Entity* playerEntityNew(GFC_Vector3D position)
 {
@@ -41,7 +42,8 @@ Entity* playerEntityNew(GFC_Vector3D position)
 
 	self->data = gfc_allocate_array(sizeof(PlayerData), 1);
 	self->free = playerFree;
-
+	self->touch = playerTouch;
+	self->team = TEAM_PLAYER;
 
 	data = (PlayerData*)self->data;
 
@@ -73,7 +75,7 @@ Entity* playerEntityNew(GFC_Vector3D position)
 	data->panSpeed = 0.05f;
 	
 	setPlayer(self);
-	strcpy(self->name, "DINOSAUR!");
+	strcpy(self->name, "Player!");
 	
 	return self;
 }
@@ -204,12 +206,12 @@ void playerThink(Entity* self)
 
 	if (gfc_input_command_down("item_left"))
 	{
-		move.x = 1;
+		move.x = -1;
 	}
 
 	if (gfc_input_command_down("item_right"))
 	{
-		move.x = -1;
+		move.x = 1;
 	}
 	
 
@@ -263,30 +265,14 @@ void playerUpdate(Entity* self)
 	//gfc_input_key_pressed();
 }
 
-/*
-	Returns the entity's current looking direction derived from Radian math around them
-	Or returns the enum for bad direction!
-*/
-int checkLookingDirection(Entity* self)
+void playerTouch(Entity* self, Entity* toucher)
 {
-	float rotX;
-	PlayerData* data;
-	if (!self || !self->data)
+	if (!self || !toucher)
 	{
-		return;
-	}
-	data = (PlayerData*)self->data;
-	
-	if (!data)
-	{
+		slog("Player is trying to touch/be touched by an error!");
 		return;
 	}
 
-	rotX = data->playerRotation.x;
+	//Do collision checks!
 
-	//Check North
-	//if ()
-	{
-
-	}
 }

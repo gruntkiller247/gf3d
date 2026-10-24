@@ -18,6 +18,9 @@ void playerThink(Entity* self);
 
 void playerUpdate(Entity* self);
 
+void playerFree(Entity* self);
+
+void playerTouch(Entity* self, Entity* toucher);
 
 
 

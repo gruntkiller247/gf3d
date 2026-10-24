@@ -120,6 +120,56 @@ void entityThinkAll()
 	}
 }
 
+void entityTouch(Entity* self, Entity* toucher)
+{
+	if (!self || !toucher)
+	{
+		return;
+	}
+
+	
+	if (self->touch)
+	{
+		self->touch(self, toucher);
+	}
+	else
+	{
+		slog("Entity has no touch!");
+	}
+
+	if (toucher->touch)
+	{
+		toucher->touch(toucher, self);
+	}
+	else
+	{
+		slog("Entity has no touch!");
+	}
+
+}
+
+void entityTouchAll()
+{
+	int c,d;
+	for (c = 0; c < entityManager.maxEnts; c++)
+	{
+		if (!entityManager.entityList[c]._inUse)
+			continue;
+
+		for (d = c + 1; d < entityManager.maxEnts; d++)
+		{
+			if (!entityManager.entityList[d]._inUse)
+				continue;
+
+			if (entityManager.entityList[d].team == entityManager.entityList[c].team)
+				continue;
+
+			entityTouch(&entityManager.entityList[c], &entityManager.entityList[d]);
+		}
+		
+	}
+}
+
 void entityDraw(Entity* self)
 {
 	int c;
@@ -229,6 +279,23 @@ Entity* getCamera()
 	return theCamera;
 }
 
+void hitWall(Entity* toucher)
+{
+	if (!toucher)
+	{
+		return;
+	}
+
+	//To Do! Implement hard stop for entities here!
+
+	if (toucher->team == TEAM_PLAYER)
+	{
+		if (strcmp(toucher->name, "Player"))
+		{
+			toucher->velocity.x = 0;
+		}
+	}
+}
 
 
 

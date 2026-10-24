@@ -77,6 +77,7 @@ void cameraThink(Entity* self)
 	float pitch = pData->playerRotation.y;
 	float distance = data->cameraFollowDistance;
 
+	//Uses spherical coordinates and trigonometric coordinate conversion
 	//Calculate the camera's horizontal distance and height
 	offset.x = distance * cosf(pitch) * sinf(yaw);
 	offset.y = -distance * cosf(pitch) * cosf(yaw);
