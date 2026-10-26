@@ -37,8 +37,11 @@ typedef struct Entity_S
 	GFC_Vector3D	position;
 	GFC_Vector3D	rotation;
 	GFC_Vector3D	scale;
+
+	GFC_Box			bounds;
 	
 	GFC_Vector3D	velocity;
+	GFC_Vector3D	velocityLastFrame;
 	GFC_Color		color;
 	
 	void		(*think)(struct Entity_S* self);	
@@ -99,6 +102,7 @@ void setCamera(Entity* newCam);
 
 Entity* getCamera();
 
+//Probably need each entity type to define this
 void hitWall(Entity* toucher);
 
 int checkLookingDirection(Entity* self);

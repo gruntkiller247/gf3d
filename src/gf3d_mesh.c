@@ -341,7 +341,6 @@ Mesh* gf3d_mesh_load_obj(const char* filename)
 
     slog("Mesh Prim created!");
    
-
     data = gf3d_obj_load_from_file(filename);
     if (!data)
     {
@@ -350,6 +349,8 @@ Mesh* gf3d_mesh_load_obj(const char* filename)
         slog("Failed to allocate objData for mesh!");
         return NULL;
     }
+
+    mesh->bounds = data->bounds;
 
     slog("Data prim created!");
 

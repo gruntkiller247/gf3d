@@ -18,6 +18,12 @@ Level* levelNew()
 	}
 
 	//Boilerplate stuff
+
+	//Read LevelLoad to get JSON stuff!
+	level->minRoomSize = 3;
+	level->maxRoomSize = 10;
+	level->width = 100;
+	level->height= 100;
 	gfc_matrix4_identity(level->terrainMatrix);
 
 	return level;
@@ -202,4 +208,65 @@ Uint8 levelLineTest(Level* level, GFC_Edge3D edge, GFC_Vector3D *contactpoint)
 Level* getLevel()
 {
 	return theLevel;
+}
+
+Level* levelLoadTest()
+{
+	Level* level;
+	GFC_List* floor;
+	GFC_List* row;
+	int c, d;
+	int size;
+	int* val;
+	
+	level = levelNew();
+
+	if (!level)
+	{
+		slog("Failed to create the level!");
+		return NULL;
+	}
+
+	//Level now knows its own X and Y size for where it wants to let the wander rng wander
+	//Level now knows the min and max room size
+	
+	//Floor now needs to become a level map
+	//Floor will be a list of lists based on the size of the level. size X * Y
+	size = level->width * level->height;
+
+	floor = gfc_allocate_array(sizeof(Uint16), level->width);
+	
+
+	if (!floor)
+	{
+		slog("Failed to create array for floorplan!");
+		goto fail;
+	}
+
+	for (c = 0; c < floor->count; c++)
+	{
+
+	}
+	
+
+	return level;
+	
+	fail:
+
+	if (level)
+	{
+		levelFree(level);
+	}
+
+	if (floor)
+	{
+		for (c = 0; c < floor->count; c++)
+		{
+			if (gfc_list_get_nth(floor,c))
+			{
+				gfc_list_delete_nth(floor,c);
+			}
+		}
+		gfc_list_delete(floor);
+	}
 }

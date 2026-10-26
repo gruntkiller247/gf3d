@@ -286,6 +286,8 @@ Model* model_load(const char* filename)
 		return NULL;
 	}
 
+	
+
 	slog("Loaded mesh for model! %s",filename);
 
 	str2 = sj_object_get_string(data, "texture");
@@ -430,7 +432,7 @@ void sky_queue_render(Model* model, GFC_Matrix4 mat,GFC_Color color)
 
 Pipeline* model_get_pipeline()
 {
-	slog("Someone is asking for the model pipe!");
+	//slog("Someone is asking for the model pipe!");
 	return modelManager.pipe;
 }
 

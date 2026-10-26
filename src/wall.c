@@ -20,7 +20,9 @@ Entity* spawnWall(GFC_Vector3D position, Model* model)
 	self->model = model;
 	self->position = position;
 	self->touch = wallTouch;
+	self->bounds = self->model->mesh->bounds;
 
+	self->bounds = self->model->mesh->bounds;
 	return self;
 
 }

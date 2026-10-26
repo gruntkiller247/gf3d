@@ -20,6 +20,7 @@ static Level* theLevel = NULL;
 
 void playerFree(Entity* self);
 void playerTouch(Entity* self, Entity* toucher);
+void playerDraw(Entity* self);
 
 Entity* playerEntityNew(GFC_Vector3D position)
 {
@@ -35,7 +36,7 @@ Entity* playerEntityNew(GFC_Vector3D position)
 		return NULL;
 	}
 
-	//self->model = model_load("models/dino/dino.model");
+	self->model = model_load("models/dino/dino.model");
 	self->position = position;
 	self->think = playerThink;
 	self->update = playerUpdate;
@@ -43,7 +44,17 @@ Entity* playerEntityNew(GFC_Vector3D position)
 	self->data = gfc_allocate_array(sizeof(PlayerData), 1);
 	self->free = playerFree;
 	self->touch = playerTouch;
+	self->draw = playerDraw;
 	self->team = TEAM_PLAYER;
+	self->velocityLastFrame = gfc_vector3d(0,0,0);
+
+
+	//GFC Box has a bounds. x,y,z w,h,d
+	//x,y,z are the minimum positions of the box
+	//w,h,d are the routes to the max pos
+	//maxX,maxY,maxZ = x+w, y+h, z+d
+
+	self->bounds = self->model->mesh->bounds;
 
 	data = (PlayerData*)self->data;
 
@@ -191,7 +202,7 @@ void playerThink(Entity* self)
 		
 	}
 
-	slog("\nPlayerRotation x: %f\nPlayerRotation y: %f", data->playerRotation.x, data->playerRotation.y);
+	//slog("\nPlayerRotation x: %f\nPlayerRotation y: %f", data->playerRotation.x, data->playerRotation.y);
 	
 	//Player Movement
 	if (gfc_input_command_down("item_up"))
@@ -224,7 +235,7 @@ void playerThink(Entity* self)
 
 		gfc_vector3d_rotate_about_z(&move, data->playerRotation.x);
 
-
+		self->velocityLastFrame = self->velocityLastFrame;
 		self->velocity = move;
 	}
 
@@ -238,7 +249,7 @@ void playerThink(Entity* self)
 	gfc_vector3d_rotate_about_x(&offset, data->playerRotation.y);
 	self->rotation.y = data->playerRotation.y;
 
-	if (gfc_vector3d_magnitude_squared(self->velocity) < 0.1)
+	if (gfc_vector3d_magnitude_squared(self->velocity) > 0.1)
 	{
 		gfc_vector3d_scale(self->velocity, self->velocity, 0.8);
 	}
@@ -247,8 +258,9 @@ void playerThink(Entity* self)
 		//slog("Clearing!");
 		gfc_vector3d_clear(self->velocity);
 	}
+	//slog("Player's current velocity: %f,%f,%f\nPlayer's last frame velocity: %f,%f,%f", self->velocity.x, self->velocity.y, self->velocity.z, self->velocityLastFrame.x, self->velocityLastFrame.y, self->velocityLastFrame.z);
 
-	slog("\nPlayer's spacial position x: %f\nPlayer's spacial position y: %f",self->position.x,self->position.y);
+	//slog("\nPlayer's spacial position x: %f\nPlayer's spacial position y: %f",self->position.x,self->position.y);
 }
 
 void playerUpdate(Entity* self)
@@ -259,19 +271,66 @@ void playerUpdate(Entity* self)
 		slog("Player does not exist in update!");
 		return NULL;
 	}
-
+	
 
 
 	//gfc_input_key_pressed();
 }
 
+void playerDraw(Entity* self)
+{
+	if (!self)
+		return;
+
+	//TO DO ANYTHING RELEVANT HERE!
+	//FOR NOW THE PLAYER HAS NO MODEL!
+}
+
 void playerTouch(Entity* self, Entity* toucher)
 {
+	//Player's box
+	//Min num
+	int pX, pY, pZ;
+	int pW, pH, pD;
+	//Max num are the aboves combined
+
+	//Toucher's box
+	//Min nums
+	int tX, tY, tZ;
+	int tW, tH, tD;
+	//Max num are the aboves combined
+
 	if (!self || !toucher)
 	{
 		slog("Player is trying to touch/be touched by an error!");
 		return;
 	}
+
+	pX = self->bounds.x;
+	pY = self->bounds.y;
+	pZ = self->bounds.z;
+	pW = self->bounds.w;
+	pH = self->bounds.h;
+	pD = self->bounds.d;
+
+	tX = toucher->bounds.x;
+	tY = toucher->bounds.y;
+	tZ = toucher->bounds.z;
+	tW = toucher->bounds.w;
+	tH = toucher->bounds.h;
+	tD = toucher->bounds.d;
+
+	//Check if we are touching
+	if (pX <= tX + tW && pX + pW >= tX && pY <= tY + tH && pY + pH >= tY && pZ <= tZ + tD && pZ + pD >= tZ)
+	{
+		slog("Touching something!");
+	}
+	else
+	{
+		//Not touching on the X
+	}
+
+
 
 	//Do collision checks!
 

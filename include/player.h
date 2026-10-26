@@ -22,6 +22,8 @@ void playerFree(Entity* self);
 
 void playerTouch(Entity* self, Entity* toucher);
 
+void playerDraw(Entity* self);
+
 
 
 #endif

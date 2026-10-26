@@ -13,18 +13,35 @@ typedef struct
 	Model* sky;
 	GFC_TextLine skyFile;
 	GFC_TextLine terrainFile;
-	GFC_Box bounds;				//Don't let anything leave this
+	GFC_Box bounds;				
 	Mix_Music* backgroundMusic;
 	GFC_TextLine musicFile;
 
 	GFC_Matrix4 terrainMatrix;
 	SJson* json;	//Keep the json around in case need to refrence
+
+	Uint16 maxRoomSize;	//Max size a random room can be!
+	Uint16 minRoomSize;	//Min size a random room can be!
+	Uint16 width;	//Size of the level matrix!
+	Uint16 height;
+	GFC_Matrix2 floorPlan; //2D matrix representation of the level
+	
 }Level;
+
+typedef enum
+{
+	//Currently marked at max size of Uint16 in level load!
+	LT_WALL,		//Edge of each room/Default space
+	LT_EMPTY_FLOOR,	//Tile without an item on it?
+
+}LevelTiles;
 
 
 Level* levelNew();
 
 Level*levelLoad(const char* filename);
+
+Level* levelLoadTest();
 
 //World.Execute(Me)
 void levelFree(Level* level);
