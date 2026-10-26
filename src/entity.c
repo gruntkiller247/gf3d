@@ -17,6 +17,7 @@ typedef struct
 }EntityManager;
 
 static EntityManager entityManager = { 0 };
+static Uint32 id = 0;
 
 void entityClose();
 void entityFree(Entity* thing);
@@ -62,6 +63,10 @@ Entity* entityNew()
 			continue;
 
 		entityManager.entityList[c]._inUse = 1;
+		entityManager.entityList[c].id = id;
+		
+		id++;
+
 		entityManager.entityList[c].scale = gfc_vector3d(1,1,1);
 		entityManager.entityList[c].color = GFC_COLOR_WHITE;
 		//entityManager.entityList[c].model = "models/dino/dino.json"; //"models/floor/floor.json";
@@ -134,17 +139,19 @@ void entityTouch(Entity* self, Entity* toucher)
 	}
 	else
 	{
-		slog("Entity has no touch!");
+		//slog("Entity has no touch!");
 	}
 
+	/*
 	if (toucher->touch)
 	{
 		toucher->touch(toucher, self);
 	}
 	else
 	{
-		slog("Entity has no touch!");
+		//slog("Entity has no touch!");
 	}
+	*/
 
 }
 
@@ -156,9 +163,15 @@ void entityTouchAll()
 		if (!entityManager.entityList[c]._inUse)
 			continue;
 
+		if (entityManager.entityList[c].team == TEAM_IGNORE)
+			continue;
+
 		for (d = c + 1; d < entityManager.maxEnts; d++)
 		{
 			if (!entityManager.entityList[d]._inUse)
+				continue;
+
+			if (entityManager.entityList[d].team == TEAM_IGNORE)
 				continue;
 
 			if (entityManager.entityList[d].team == entityManager.entityList[c].team)

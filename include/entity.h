@@ -32,6 +32,7 @@ typedef struct Entity_S
 	GFC_Matrix4		mat;
 	Uint32			layer;
 	Uint8			team;
+	Uint32			id;
 	
 
 	GFC_Vector3D	position;
@@ -49,7 +50,7 @@ typedef struct Entity_S
 	void		(*draw)(struct Entity_S* self);
 	void		(*free)(struct Entity_S* self);
 	void		(*touch)(struct Entity_S* self, struct Entity_S* toucher);
-	void*	data;								//Used for custom data. Must create a free function for it!
+	void*		data;								//Used for custom data. Must create a free function for it!
 
 	GFC_TextLine	name;
 	Uint8 directionLooking;

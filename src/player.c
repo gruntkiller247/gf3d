@@ -306,16 +306,16 @@ void playerTouch(Entity* self, Entity* toucher)
 		return;
 	}
 
-	pX = self->bounds.x;
-	pY = self->bounds.y;
-	pZ = self->bounds.z;
+	pX = self->bounds.x + self->position.x;
+	pY = self->bounds.y + self->position.y;
+	pZ = self->bounds.z + self->position.z;
 	pW = self->bounds.w;
 	pH = self->bounds.h;
 	pD = self->bounds.d;
 
-	tX = toucher->bounds.x;
-	tY = toucher->bounds.y;
-	tZ = toucher->bounds.z;
+	tX = toucher->bounds.x + toucher->position.x;
+	tY = toucher->bounds.y + toucher->position.y;
+	tZ = toucher->bounds.z + toucher->position.z;
 	tW = toucher->bounds.w;
 	tH = toucher->bounds.h;
 	tD = toucher->bounds.d;
@@ -323,15 +323,11 @@ void playerTouch(Entity* self, Entity* toucher)
 	//Check if we are touching
 	if (pX <= tX + tW && pX + pW >= tX && pY <= tY + tH && pY + pH >= tY && pZ <= tZ + tD && pZ + pD >= tZ)
 	{
-		slog("Touching something!");
+		slog("Player is touching a thing! The thing's ID is %i", toucher->id);
 	}
 	else
 	{
 		//Not touching on the X
 	}
-
-
-
-	//Do collision checks!
 
 }

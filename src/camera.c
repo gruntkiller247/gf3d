@@ -24,7 +24,7 @@ Entity* cameraEntityNew()
 	self->think = cameraThink;
 	self->draw = cameraDraw;
 	self->data = gfc_allocate_array(sizeof(CameraData), 1);
-
+	self->team = TEAM_IGNORE;
 	data = (CameraData*)self->data;
 
 	if (!data)
