@@ -1,0 +1,10 @@
+{
+  "items": 
+  [
+    {
+      "name": "book",
+      "model": "Link to model in files",
+      "_comment":  "Grab the model json stuff and place it here!"
+    }
+  ]
+}

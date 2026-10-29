@@ -103,8 +103,14 @@ void setCamera(Entity* newCam);
 
 Entity* getCamera();
 
-//Probably need each entity type to define this
-void hitWall(Entity* toucher);
+/*
+	Returns a Vector3D with the difference between the entity's current and previous velocity
 
-int checkLookingDirection(Entity* self);
+*/
+GFC_Vector3D deltaVelocity(Entity* self);
+
+//Probably need each entity type to define this
+//void hitWall(Entity* toucher);
+
+//int checkLookingDirection(Entity* self);
 #endif

@@ -22,6 +22,9 @@
     <Filter Include="Levels">
       <UniqueIdentifier>{fef38357-f48f-4b7f-9076-04ebf136f87f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="jsons">
+      <UniqueIdentifier>{3e033737-f68e-4531-8dd5-fbf348e2ab2c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\gf2d_actor.h">
@@ -201,6 +204,12 @@
     <ClInclude Include="..\include\monster.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\camera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\item.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\game.c">
@@ -374,6 +383,12 @@
     <ClCompile Include="..\src\monster.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\camera.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\item.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\config\audio.cfg">
@@ -405,6 +420,9 @@
     </None>
     <None Include="..\levels\testLevel.level">
       <Filter>Levels</Filter>
+    </None>
+    <None Include="..\json\items.json">
+      <Filter>jsons</Filter>
     </None>
   </ItemGroup>
 </Project>

@@ -28,6 +28,9 @@ Entity* playerEntityNew(GFC_Vector3D position)
 	Entity* camera;
 	PlayerData* data;
 
+	if (thePlayer)
+		return thePlayer;
+
 	self = entityNew();
 
 	if (!self)
@@ -323,7 +326,17 @@ void playerTouch(Entity* self, Entity* toucher)
 	//Check if we are touching
 	if (pX <= tX + tW && pX + pW >= tX && pY <= tY + tH && pY + pH >= tY && pZ <= tZ + tD && pZ + pD >= tZ)
 	{
-		slog("Player is touching a thing! The thing's ID is %i", toucher->id);
+		//slog("Player is touching a thing! The thing's ID is %i", toucher->id);
+		switch (toucher->team)
+		{
+			case TEAM_WALL:
+				slog("Player is touching a wall!");
+				break;
+
+			default:
+				//There is nothign!
+			break;
+		}
 	}
 	else
 	{

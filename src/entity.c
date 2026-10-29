@@ -292,6 +292,17 @@ Entity* getCamera()
 	return theCamera;
 }
 
+
+//IDK if I need this
+GFC_Vector3D deltaVelocity(Entity* self)
+{
+	if (!self)
+		return;
+
+	//return gfc_vector3d_new();
+}
+
+/*
 void hitWall(Entity* toucher)
 {
 	if (!toucher)
@@ -309,6 +320,7 @@ void hitWall(Entity* toucher)
 		}
 	}
 }
+*/
 
 
 

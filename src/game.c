@@ -94,11 +94,11 @@ int main(int argc,char *argv[])
     
     //Entity* floor = entityNew(); //"models/dino/dino.json"
     Model* floor = model_load("models/floor/floor.json");
-    //Entity* wall = spawnWall(gfc_vector3d(0,0,0),floor);
-    //wall->rotation = gfc_vector3d(0,0,0);
+    Entity* wall = spawnWall(gfc_vector3d(0,0,0),floor);
+    wall->rotation = gfc_vector3d(0,0,0);
 
-    Model* dino = model_load("models/dino/dino.model");
-    Entity* wall2 = spawnWall(gfc_vector3d(5,5,0),dino);
+    //Model* dino = model_load("models/dino/dino.model");
+    //Entity* wall2 = spawnWall(gfc_vector3d(5,5,0),dino);
 
 
     // main game loop    
