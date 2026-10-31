@@ -263,7 +263,7 @@ void playerThink(Entity* self)
 	}
 	//slog("Player's current velocity: %f,%f,%f\nPlayer's last frame velocity: %f,%f,%f", self->velocity.x, self->velocity.y, self->velocity.z, self->velocityLastFrame.x, self->velocityLastFrame.y, self->velocityLastFrame.z);
 
-	//slog("\nPlayer's spacial position x: %f\nPlayer's spacial position y: %f",self->position.x,self->position.y);
+	slog("\nPlayer's spacial position x: %f\nPlayer's spacial position y: %f",self->position.x,self->position.y);
 }
 
 void playerUpdate(Entity* self)

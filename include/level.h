@@ -3,6 +3,9 @@
 
 #include "model.h"
 #include "gfc_audio.h"
+#include "entity.h"
+
+typedef struct Entity_S Entity;
 
 
 //Can I hold many levels in memory at once?
@@ -30,6 +33,17 @@ typedef struct
 
 typedef enum
 {
+	LB_NO_TOUCH = 0,
+	LB_MIN_X,
+	LB_MIN_Y,
+	LB_MIN_Z,
+	LB_MAX_X,
+	LB_MAX_Y,
+	LB_MAX_Z
+}Bounds;
+
+typedef enum
+{
 	//Currently marked at max size of Uint16 in level load!
 	LT_WALL,		//Edge of each room/Default space
 	LT_EMPTY_FLOOR,	//Tile without an item on it?
@@ -52,5 +66,8 @@ Level* getLevel();
 
 Uint8 levelLineTest(Level* level, GFC_Edge3D edge, GFC_Vector3D* contactpoint);
 
+Uint8 levelBoundsCheck(Level* level, GFC_Box aabb);
+
+void levelPosCheck(Level* level, Entity* self);
 
 #endif

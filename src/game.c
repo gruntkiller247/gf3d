@@ -100,6 +100,7 @@ int main(int argc,char *argv[])
     //Model* dino = model_load("models/dino/dino.model");
     //Entity* wall2 = spawnWall(gfc_vector3d(5,5,0),dino);
 
+    levelNew();
 
     // main game loop    
     while(!_done)

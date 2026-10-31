@@ -70,16 +70,31 @@ Entity* entityNew()
 		entityManager.entityList[c].scale = gfc_vector3d(1,1,1);
 		entityManager.entityList[c].color = GFC_COLOR_WHITE;
 		//entityManager.entityList[c].model = "models/dino/dino.json"; //"models/floor/floor.json";
-		entityManager.entityList[c].directionLooking = 0;
+		//entityManager.entityList[c].directionLooking = 0;
+
 		return &entityManager.entityList[c];
 	}
+
+	return NULL;
 }
 
 void entityUpdate(Entity* self)
 {
+	Uint8 bounds;
+	Level* level;
+
 	if (!self)
 	{
 		slog("Cannot update NULL entity!");
+		return;
+	}
+
+
+	level = getLevel();
+
+	if (!level)
+	{
+		slog("Failed to get the level in Entity Update!");
 		return;
 	}
 
@@ -87,6 +102,71 @@ void entityUpdate(Entity* self)
 	{
 		self->update(self);
 	}
+
+	levelPosCheck(level, self);
+
+	/*
+	bounds = levelBoundsCheck(getLevel(), self->bounds);
+
+	//slog("Bounds: %i", bounds);
+
+	switch (bounds)
+	{
+		case LB_NO_TOUCH:
+			
+		break;
+
+		case LB_MIN_X:
+
+			self->position.x = level->bounds.x;
+
+			break;
+
+		case LB_MAX_X:
+
+			self->position.x = level->bounds.x + level->bounds.w;
+			break;
+
+		case LB_MIN_Y:
+
+			self->position.y = level->bounds.y;
+
+			break;
+
+		case LB_MAX_Y:
+
+			self->position.y = level->bounds.y + level->bounds.h;
+			break;
+
+		case LB_MIN_Z:
+
+			self->position.z = level->bounds.z;
+
+			break;
+
+		case LB_MAX_Z:
+
+			self->position.z = level->bounds.z + level->bounds.d;
+			
+			break;
+
+		default:
+
+			slog("Bogus data from levelBoundsCheck!");
+			break;
+	}
+	
+
+
+
+	//Put everything involving movement here!
+
+	//if (!entityMoveCheck(self, self->velocity))
+	{
+		//gfc_vector3d_add(self->position, self->velocity);
+	}
+	*/
+
 }
 
 
@@ -293,6 +373,10 @@ Entity* getCamera()
 }
 
 
+
+
+
+
 //IDK if I need this
 GFC_Vector3D deltaVelocity(Entity* self)
 {
@@ -302,25 +386,8 @@ GFC_Vector3D deltaVelocity(Entity* self)
 	//return gfc_vector3d_new();
 }
 
-/*
-void hitWall(Entity* toucher)
-{
-	if (!toucher)
-	{
-		return;
-	}
 
-	//To Do! Implement hard stop for entities here!
 
-	if (toucher->team == TEAM_PLAYER)
-	{
-		if (strcmp(toucher->name, "Player"))
-		{
-			toucher->velocity.x = 0;
-		}
-	}
-}
-*/
 
 
 

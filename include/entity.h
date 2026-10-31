@@ -3,6 +3,7 @@
 
 #include "model.h"
 #include "gfc_color.h"
+#include "level.h"
 
 typedef enum
 {
@@ -40,7 +41,9 @@ typedef struct Entity_S
 	GFC_Vector3D	scale;
 
 	GFC_Box			bounds;
-	
+	GFC_Vector3D	floorPoint; //Point directly below me
+	float			grounded;		//Got to level lind test add this here?
+
 	GFC_Vector3D	velocity;
 	GFC_Vector3D	velocityLastFrame;
 	GFC_Color		color;
@@ -113,4 +116,7 @@ GFC_Vector3D deltaVelocity(Entity* self);
 //void hitWall(Entity* toucher);
 
 //int checkLookingDirection(Entity* self);
+
+Uint8 moveCheck(Entity* self, GFC_Vector3D offset);
+
 #endif

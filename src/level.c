@@ -4,9 +4,11 @@
 #include "gf3d_mesh.h"
 #include "gf3d_obj_load.h"
 
-//Include jload.h
+
 
 static Level* theLevel = NULL;
+
+void setLevel(Level* inLevel);
 
 Level* levelNew()
 {
@@ -25,6 +27,11 @@ Level* levelNew()
 	level->width = 100;
 	level->height= 100;
 	gfc_matrix4_identity(level->terrainMatrix);
+
+	//Hard Coded bounds for now
+	level->bounds = gfc_box(-10,-10,-10,10,10,10);
+
+	setLevel(level);
 
 	return level;
 }
@@ -148,7 +155,7 @@ void levelDraw(Level* level)
 }
 
 
-//Keyhoe Broke
+//Keyhoe Broke - might be working now?
 Uint8 levelLineTest(Level* level, GFC_Edge3D edge, GFC_Vector3D *contactpoint)
 {
 	Mesh* mesh;
@@ -183,9 +190,9 @@ Uint8 levelLineTest(Level* level, GFC_Edge3D edge, GFC_Vector3D *contactpoint)
 		
 		for (j = 0; j < prim->objData->face_count; j++)
 		{
-			t.a = prim->objData->faceVertices[prim->objData->outFace->verts[0]].vertex;
-			t.b = prim->objData->faceVertices[prim->objData->outFace->verts[1]].vertex;
-			t.c = prim->objData->faceVertices[prim->objData->outFace->verts[2]].vertex;
+			t.a = prim->objData->faceVertices[prim->objData->outFace[j].verts[0]].vertex;
+			t.b = prim->objData->faceVertices[prim->objData->outFace[j].verts[1]].vertex;
+			t.c = prim->objData->faceVertices[prim->objData->outFace[j].verts[2]].vertex;
 			
 			if (gfc_triangle_edge_test(edge, t, &out))
 			{
@@ -269,4 +276,103 @@ Level* levelLoadTest()
 		}
 		gfc_list_delete(floor);
 	}
+}
+
+
+
+
+void levelPosCheck(Level* level, Entity* self)
+{
+	if (!level)
+	{
+		slog("Illegal Level!");
+		return;
+	}
+
+	if (self->position.x < level->bounds.x)
+	{
+		//Player is out of bounds on the min X
+		//Set player's pos to the bounds.x
+		self->position.x = level->bounds.x;
+	}
+
+	if (self->position.y < level->bounds.y)
+	{
+		self->position.y = level->bounds.y;
+	}
+
+	if (self->position.z < level->bounds.z)
+	{
+		self->position.z = level->bounds.z;
+	}
+
+	if (self->position.x > level->bounds.x + level->bounds.w)
+	{
+		self->position.x = level->bounds.x + level->bounds.w;
+	}
+
+	if (self->position.y > level->bounds.y + level->bounds.h)
+	{
+		self->position.y = level->bounds.y + level->bounds.h;
+	}
+
+	if (self->position.z > level->bounds.z + level->bounds.d)
+	{
+		self->position.z = level->bounds.z + level->bounds.d;
+	}
+}
+
+/*
+	Check if the bounding box provided is clipping or outside the level bounds
+	Recieves the level to compare and the bounding box in world space
+	Returns ENUMS 0-6 to tell you which axis and either min or max is out of bounds
+	Returns -1 if the level is illegal!
+	
+*/
+Uint8 levelBoundsCheck(Level* level, GFC_Box aabb)
+{
+	if (!level)
+	{
+		slog("Cannot bounds check illegal level");
+		return -1;
+	}
+
+	if (aabb.x < level->bounds.x)
+	{
+		return LB_MIN_X;
+	}
+
+	if (aabb.y < level->bounds.y)
+	{
+		return LB_MIN_Y;
+	}
+
+	if (aabb.z < level->bounds.z)
+	{
+		return LB_MIN_Z;
+	}
+
+	if (aabb.x + aabb.w > level->bounds.x + level->bounds.w)
+	{
+		return LB_MAX_X;
+	}
+
+	if (aabb.y + aabb.h > level->bounds.y + level->bounds.h)
+	{
+		return LB_MAX_Y;
+	}
+
+	if (aabb.z + aabb.d > level->bounds.z + level->bounds.d)
+	{
+		return LB_MAX_Z;
+	}
+
+
+
+	return LB_NO_TOUCH;
+}
+
+void setLevel(Level* inLevel)
+{
+	theLevel = inLevel;
 }

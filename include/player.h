@@ -8,7 +8,6 @@ typedef struct Player_S
 	Entity* camera;
 	GFC_Vector2D playerRotation;
 	float panSpeed;
-	
 
 }PlayerData;
 
