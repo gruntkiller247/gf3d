@@ -376,7 +376,6 @@ Entity* getCamera()
 
 
 
-
 //IDK if I need this
 GFC_Vector3D deltaVelocity(Entity* self)
 {

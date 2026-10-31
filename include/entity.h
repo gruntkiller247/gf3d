@@ -117,6 +117,8 @@ GFC_Vector3D deltaVelocity(Entity* self);
 
 //int checkLookingDirection(Entity* self);
 
-Uint8 moveCheck(Entity* self, GFC_Vector3D offset);
+void moveCheck(Entity* self, Entity* toucher);
+
+
 
 #endif

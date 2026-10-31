@@ -24,12 +24,13 @@ Level* levelNew()
 	//Read LevelLoad to get JSON stuff!
 	level->minRoomSize = 3;
 	level->maxRoomSize = 10;
+
 	level->width = 100;
 	level->height= 100;
-	gfc_matrix4_identity(level->terrainMatrix);
+	//gfc_matrix4_identity(level->terrainMatrix);
 
 	//Hard Coded bounds for now
-	level->bounds = gfc_box(-10,-10,-10,10,10,10);
+	level->bounds = gfc_box(-50,-50,-50,100,100,100);
 
 	setLevel(level);
 
@@ -62,6 +63,7 @@ Level* levelLoad(const char* filename)
 
 	data = sj_object_get_value(json,"level");
 
+	/*
 	str = sj_object_get_string(data, "sky");
 
 	if (str)
@@ -84,6 +86,7 @@ Level* levelLoad(const char* filename)
 		
 		//goto fail;
 	}
+	*/
 
 	str = sj_object_get_string(data, "terrain");
 
@@ -128,8 +131,8 @@ void levelFree(Level* level)
 		return;
 	}
 
-	model_free(level->sky);
-	model_free(level->terrain);
+	//model_free(level->sky);
+	//model_free(level->terrain);
 
 	Mix_HaltMusic();
 	Mix_FreeMusic(level->backgroundMusic);
@@ -166,12 +169,12 @@ Uint8 levelLineTest(Level* level, GFC_Edge3D edge, GFC_Vector3D *contactpoint)
 	GFC_Vector3D out = { -1 };
 
 
-	if (!level || !level->terrain || !level->terrain->mesh)
+	if (!level)
 	{
 		return -1;
 	}
 
-	c = gfc_list_count(level->terrain->mesh->primitives);
+	/*c = gfc_list_count(level->terrain->mesh->primitives);
 
 	for (i = 0; i < c; i++)
 	{
@@ -206,6 +209,7 @@ Uint8 levelLineTest(Level* level, GFC_Edge3D edge, GFC_Vector3D *contactpoint)
 			}
 		}
 	}
+	*/
 
 	//Failed to hit anything
 	return 0;

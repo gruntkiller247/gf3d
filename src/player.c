@@ -263,7 +263,7 @@ void playerThink(Entity* self)
 	}
 	//slog("Player's current velocity: %f,%f,%f\nPlayer's last frame velocity: %f,%f,%f", self->velocity.x, self->velocity.y, self->velocity.z, self->velocityLastFrame.x, self->velocityLastFrame.y, self->velocityLastFrame.z);
 
-	slog("\nPlayer's spacial position x: %f\nPlayer's spacial position y: %f",self->position.x,self->position.y);
+	//slog("\nPlayer's spacial position x: %f\nPlayer's spacial position y: %f",self->position.x,self->position.y);
 }
 
 void playerUpdate(Entity* self)
@@ -293,14 +293,14 @@ void playerTouch(Entity* self, Entity* toucher)
 {
 	//Player's box
 	//Min num
-	int pX, pY, pZ;
-	int pW, pH, pD;
+	float pX, pY, pZ;
+	float pW, pH, pD;
 	//Max num are the aboves combined
 
 	//Toucher's box
 	//Min nums
-	int tX, tY, tZ;
-	int tW, tH, tD;
+	float tX, tY, tZ;
+	float tW, tH, tD;
 	//Max num are the aboves combined
 
 	if (!self || !toucher)
@@ -326,16 +326,56 @@ void playerTouch(Entity* self, Entity* toucher)
 	//Check if we are touching
 	if (pX <= tX + tW && pX + pW >= tX && pY <= tY + tH && pY + pH >= tY && pZ <= tZ + tD && pZ + pD >= tZ)
 	{
-		//slog("Player is touching a thing! The thing's ID is %i", toucher->id);
-		switch (toucher->team)
-		{
-			case TEAM_WALL:
-				slog("Player is touching a wall!");
-				break;
+		//Calculate overlap on each axis
+		float overlapX = (pX + pW) - tX;
+		float overlapY = (pY + pH) - tY;
+		float overlapZ = (pZ + pD) - tZ;
 
-			default:
-				//There is nothign!
-			break;
+		//Also calculate overlap from the opposite direction
+		float overlapX2 = (tX + tW) - pX;
+		float overlapY2 = (tY + tH) - pY;
+		float overlapZ2 = (tZ + tD) - pZ;
+
+		if (overlapX > overlapX2)
+		{
+			overlapX = overlapX2;
+		}
+
+		if (overlapY > overlapY2)
+		{
+			overlapY = overlapY2;
+		}
+
+		if (overlapZ > overlapZ2)
+		{
+			overlapZ = overlapZ2;
+		}
+
+		if (overlapX <= overlapY && overlapX <= overlapZ)
+		{
+			//Resolve X collision
+			if (pX < tX)
+				self->position.x -= overlapX;
+			else
+				self->position.x += overlapX;
+		}
+		else if (overlapY <= overlapX && overlapY <= overlapZ)
+		{
+			//Resolve Y collision
+			if (pY < tY)
+				self->position.y -= overlapY;
+			else
+				self->position.y += overlapY;
+		}
+		else
+		{
+			/*
+			//Resolve Z collision
+			if (pZ < tZ)
+				self->position.z -= overlapZ;
+			else
+				self->position.z += overlapZ;
+			*/
 		}
 	}
 	else

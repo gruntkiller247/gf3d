@@ -12,20 +12,23 @@ typedef struct Entity_S Entity;
 //1 level at a time. Make another each run. No Resource manager
 typedef struct
 {
-	Model *terrain;
-	Model* sky;
-	GFC_TextLine skyFile;
-	GFC_TextLine terrainFile;
-	GFC_Box bounds;				
+	//Model *terrain;
+	//Model* sky;
+	//GFC_TextLine skyFile;
+	//GFC_TextLine terrainFile;
+	//GFC_Matrix4 terrainMatrix;
+
 	Mix_Music* backgroundMusic;
 	GFC_TextLine musicFile;
 
-	GFC_Matrix4 terrainMatrix;
 	SJson* json;	//Keep the json around in case need to refrence
 
 	Uint16 maxRoomSize;	//Max size a random room can be!
 	Uint16 minRoomSize;	//Min size a random room can be!
-	Uint16 width;	//Size of the level matrix!
+
+	GFC_Box bounds;		//Bounds of the entire level - Should be the max width of the entire 'floor'
+
+	Uint16 width;		//Size of the level matrix!
 	Uint16 height;
 	GFC_Matrix2 floorPlan; //2D matrix representation of the level
 	
