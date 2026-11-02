@@ -5,6 +5,7 @@
 #include "gfc_audio.h"
 #include "entity.h"
 
+
 typedef struct Entity_S Entity;
 
 
@@ -22,15 +23,23 @@ typedef struct
 	GFC_TextLine musicFile;
 
 	SJson* json;	//Keep the json around in case need to refrence
-
-	Uint16 maxRoomSize;	//Max size a random room can be!
-	Uint16 minRoomSize;	//Min size a random room can be!
-
 	GFC_Box bounds;		//Bounds of the entire level - Should be the max width of the entire 'floor'
 
-	Uint16 width;		//Size of the level matrix!
-	Uint16 height;
-	GFC_Matrix2 floorPlan; //2D matrix representation of the level
+	Uint16 maxRoomSize;	//Max size a random room can be!
+	Uint16 minRoomSize;	//Min size a random room can be!	
+	
+
+	//width = 0, height = 0 = (0,0) floorPlan is the bounds effectivly with a distance of (sizeMax /2) distance
+	Uint16 sizeMax;		//Max Size of the matrix		
+	Uint16 width;		//Width of the level matrix!
+	Uint16 height;		//Height
+
+
+	//Floor plan will be a set of ints representing a floor tile/item/etc
+	GFC_List* floorPlan; //2D matrix representation of the level. In truth, a 1d Matrix
+
+	Model* floor;
+	Model* wall;
 	
 }Level;
 
@@ -44,6 +53,12 @@ typedef enum
 	LB_MAX_Y,
 	LB_MAX_Z
 }Bounds;
+
+typedef enum
+{
+	TM_EMPTY = 0
+
+}TileMap;
 
 typedef enum
 {

@@ -8,16 +8,30 @@
 
 static Level* theLevel = NULL;
 
+Level* levelLoadTest();
+
 void setLevel(Level* inLevel);
 
 Level* levelNew()
 {
+	
 	Level* level;
+	/*
 	level = gfc_allocate_array(sizeof(Level), 1);
 	if (!level)
 	{
 		slog("Failed to allocate level data!");
 	}
+	*/
+
+	level = malloc(sizeof(Level));
+
+	if (!level)
+	{
+		slog("Someting went wrong!");
+		return;
+	}
+
 
 	//Boilerplate stuff
 
@@ -25,14 +39,14 @@ Level* levelNew()
 	level->minRoomSize = 3;
 	level->maxRoomSize = 10;
 
-	level->width = 100;
-	level->height= 100;
 	//gfc_matrix4_identity(level->terrainMatrix);
 
 	//Hard Coded bounds for now
 	level->bounds = gfc_box(-50,-50,-50,100,100,100);
 
 	setLevel(level);
+
+	
 
 	return level;
 }
@@ -134,6 +148,16 @@ void levelFree(Level* level)
 	//model_free(level->sky);
 	//model_free(level->terrain);
 
+	if (level->floorPlan)
+	{
+		free(level->floorPlan);
+	}
+
+	if (level->floor)
+	{
+		model_free(floor);
+	}
+
 	Mix_HaltMusic();
 	Mix_FreeMusic(level->backgroundMusic);
 
@@ -145,20 +169,48 @@ void levelFree(Level* level)
 
 void levelDraw(Level* level)
 {
-	GFC_Matrix4 id;
+	int c = 0;
+	int x, y;
+	int z = 0;
+	GFC_Matrix4 mat;
+
+	GFC_Vector3D* temp;
+
 	if (!level)
 	{
 		return;
 	}
 
-	gfc_matrix4_identity(id);
+	//Draw the width x height of the "floor" using floors
+
+	for (c = 0; c < level->sizeMax; c++)
+	{
+
+		//Need to convert the position to a 3d position in space
+		//The floor will always be z = 0;
+		//x and y will be converted from 1d to 2d array
+
+		x = c % level->width;
+		y = c / level->width;
+
+		//Vector3 = x,y,z
+		temp = gfc_vector3d_new(x, y, z);
+
+
+		//Switch statement to see what tile type to draw later
+
+		if(level->floorPlan->elements)
+
+		//gfc_matrix4_scale(mat,level->floorPlan[c].);
+
+	}
 
 	//modelqueuerender sky   level->sky,id,gfc_white
 	//model queue render terrain   level->terrain, level->terrain matrix, ?
 }
 
 
-//Keyhoe Broke - might be working now?
+/*Keyhoe Broke - might be working now ?
 Uint8 levelLineTest(Level* level, GFC_Edge3D edge, GFC_Vector3D *contactpoint)
 {
 	Mesh* mesh;
@@ -209,12 +261,15 @@ Uint8 levelLineTest(Level* level, GFC_Edge3D edge, GFC_Vector3D *contactpoint)
 			}
 		}
 	}
-	*/
+	
 
 	//Failed to hit anything
 	return 0;
 	
 }
+
+*/
+
 
 Level* getLevel()
 {
@@ -227,8 +282,7 @@ Level* levelLoadTest()
 	GFC_List* floor;
 	GFC_List* row;
 	int c, d;
-	int size;
-	int* val;
+	int sizeMax, size, widthLevel, heightLevel;
 	
 	level = levelNew();
 
@@ -237,49 +291,51 @@ Level* levelLoadTest()
 		slog("Failed to create the level!");
 		return NULL;
 	}
-
-	//Level now knows its own X and Y size for where it wants to let the wander rng wander
-	//Level now knows the min and max room size
 	
-	//Floor now needs to become a level map
-	//Floor will be a list of lists based on the size of the level. size X * Y
-	size = level->width * level->height;
+	//2D -> 1D
+	//int index = y * width + x;
 
-	floor = gfc_allocate_array(sizeof(Uint16), level->width);
+	//1D -> 2D
+	//int x = index % width;
+	//int y = index / width;
+	
+	int width = 10, height = 10;
+	
+	sizeMax = width * height;
+
+	level->sizeMax = sizeMax;
+	level->width = width;
+	level->height = height;
+	
+	level->floorPlan = gfc_allocate_array(sizeof(int),sizeMax);
+
+	//floor = gfc_allocate_array(sizeof(Uint16), sizeMax);
 	
 
-	if (!floor)
+	if (!level->floorPlan)
 	{
 		slog("Failed to create array for floorplan!");
 		goto fail;
 	}
 
-	for (c = 0; c < floor->count; c++)
-	{
-
-	}
+	slog("Floorplan created.\nSize: %i\nWidth: %i\nHeight: %i",sizeMax,level->width,level->height);
 	
 
 	return level;
 	
-	fail:
+fail:
+
+	if (level->floorPlan)
+	{
+		free(floor);
+	}
 
 	if (level)
 	{
 		levelFree(level);
 	}
 
-	if (floor)
-	{
-		for (c = 0; c < floor->count; c++)
-		{
-			if (gfc_list_get_nth(floor,c))
-			{
-				gfc_list_delete_nth(floor,c);
-			}
-		}
-		gfc_list_delete(floor);
-	}
+
 }
 
 

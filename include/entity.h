@@ -29,31 +29,31 @@ typedef enum
 typedef struct Entity_S
 {
 	Uint8			_inUse;
-	Model			*model;
+	Model* model;
 	GFC_Matrix4		mat;
 	Uint32			layer;
 	Uint8			team;
 	Uint32			id;
-	
+
 
 	GFC_Vector3D	position;
 	GFC_Vector3D	rotation;
 	GFC_Vector3D	scale;
 
 	GFC_Box			bounds;
-	GFC_Vector3D	floorPoint; //Point directly below me
+	GFC_Vector3D	floorPoint;		//Point directly below me
 	float			grounded;		//Got to level lind test add this here?
 
 	GFC_Vector3D	velocity;
 	GFC_Vector3D	velocityLastFrame;
 	GFC_Color		color;
-	
-	void		(*think)(struct Entity_S* self);	
+
+	void		(*think)(struct Entity_S* self);
 	void		(*update)(struct Entity_S* self);
 	void		(*draw)(struct Entity_S* self);
 	void		(*free)(struct Entity_S* self);
 	void		(*touch)(struct Entity_S* self, struct Entity_S* toucher);
-	void*		data;								//Used for custom data. Must create a free function for it!
+	void* data;								//Used for custom data. Must create a free function for it!
 
 	GFC_TextLine	name;
 	Uint8 directionLooking;
@@ -64,7 +64,7 @@ static Entity* thePlayer = NULL;
 static Entity* theCamera = NULL;
 
 /*
-	@brief initialize the entity manager and pre-allocate a bunch 
+	@brief initialize the entity manager and pre-allocate a bunch
 	@param maxEnts how many entities can exist at any single moment
 */
 void entityInit(Uint32 maxEnts);
@@ -73,7 +73,7 @@ void entityInit(Uint32 maxEnts);
 	@breif get a blank entity from the system
 	@return NULL on error or out of memory, a valid pointer otherwise
 */
-Entity * entityNew();
+Entity* entityNew();
 
 /*
 	@brief call to clean up an entity after it is no longer needed
@@ -97,7 +97,6 @@ void entityDrawAll();
 
 void entityTouchAll();
 
-
 void setPlayer(Entity* newPlayer);
 
 Entity* getPlayer();
@@ -117,7 +116,7 @@ GFC_Vector3D deltaVelocity(Entity* self);
 
 //int checkLookingDirection(Entity* self);
 
-void moveCheck(Entity* self, Entity* toucher);
+//void moveCheck(Entity* self, Entity* toucher);
 
 
 
