@@ -173,13 +173,15 @@ void levelDraw(Level* level)
 	int x, y;
 	int z = 0;
 	GFC_Matrix4 mat;
-
 	GFC_Vector3D* temp;
+	
 
 	if (!level)
 	{
 		return;
 	}
+
+	gfc_matrix4_identity(mat);
 
 	//Draw the width x height of the "floor" using floors
 
@@ -198,11 +200,15 @@ void levelDraw(Level* level)
 
 
 		//Switch statement to see what tile type to draw later
-
-		if(level->floorPlan->elements)
+		//level->floorPlan->elements[c];
+		
 
 		//gfc_matrix4_scale(mat,level->floorPlan[c].);
+		//gfc_matrix4_from_vectors(mat,temp,gfc_matrix3_identity(), gfc_matrix3_identity());
+		//gfc_matrix4_make_translation(mat,*temp);
 
+		//NULL is a 4d mat
+		//gf3d_model_queue_render(level->floor, mat ,GFC_COLOR_WHITE);
 	}
 
 	//modelqueuerender sky   level->sky,id,gfc_white
@@ -337,9 +343,6 @@ fail:
 
 
 }
-
-
-
 
 void levelPosCheck(Level* level, Entity* self)
 {
