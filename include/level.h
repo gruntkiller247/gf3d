@@ -40,6 +40,12 @@ typedef struct
 
 	Model* floor;
 	Model* wall;
+
+	//Kehoe aid
+	Uint8 *tileSet;
+	GFC_Vector2I tileSize; //Make functions
+
+
 	
 }Level;
 

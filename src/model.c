@@ -240,7 +240,7 @@ Model* model_load(const char* filename)
 	model = get_by_filename(filename);
 	if (model)
 	{
-		slog("Model found by filename!");
+		//slog("Model found by filename!");
 		model->_refCount++;
 		return model;
 	}

@@ -3,6 +3,7 @@
 #include "gfc_primitives.h"
 #include "gf3d_mesh.h"
 #include "gf3d_obj_load.h"
+#include "wall.h"
 
 
 
@@ -175,6 +176,9 @@ void levelDraw(Level* level)
 	GFC_Matrix4 mat;
 	GFC_Vector3D* temp;
 	
+	Model* test;
+
+	test = model_load("models/floor/floor.json");
 
 	if (!level)
 	{
@@ -182,32 +186,29 @@ void levelDraw(Level* level)
 	}
 
 	gfc_matrix4_identity(mat);
-
-	//Draw the width x height of the "floor" using floors
-
+	
+	//slog("sizeMax: %i", level->sizeMax);
+	
 	for (c = 0; c < level->sizeMax; c++)
 	{
-
-		//Need to convert the position to a 3d position in space
-		//The floor will always be z = 0;
-		//x and y will be converted from 1d to 2d array
 
 		x = c % level->width;
 		y = c / level->width;
 
+		//slog("\nX pos: %i\nY pos: %i\nZ pos: %i",x,y,z);
+		
 		//Vector3 = x,y,z
-		temp = gfc_vector3d_new(x, y, z);
+		//At some point need to add the size of the bounds
 
+		z += 1;
 
 		//Switch statement to see what tile type to draw later
 		//level->floorPlan->elements[c];
 		
 
-		//gfc_matrix4_scale(mat,level->floorPlan[c].);
-		//gfc_matrix4_from_vectors(mat,temp,gfc_matrix3_identity(), gfc_matrix3_identity());
 		//gfc_matrix4_make_translation(mat,*temp);
 
-		//NULL is a 4d mat
+		spawnWall(gfc_vector3d(x * 2, y * 2, z) , test);
 		//gf3d_model_queue_render(level->floor, mat ,GFC_COLOR_WHITE);
 	}
 
@@ -314,6 +315,8 @@ Level* levelLoadTest()
 	level->height = height;
 	
 	level->floorPlan = gfc_allocate_array(sizeof(int),sizeMax);
+
+	level->floor = model_load("models/floor/floor.json");
 
 	//floor = gfc_allocate_array(sizeof(Uint16), sizeMax);
 	
@@ -438,4 +441,16 @@ Uint8 levelBoundsCheck(Level* level, GFC_Box aabb)
 void setLevel(Level* inLevel)
 {
 	theLevel = inLevel;
+}
+
+
+
+Uint32 levelGetTileIndex(Level* level, Uint16 x, Uint16 y)
+{
+	if (!level)
+	{
+		return -1;
+	}
+
+	//return y * level->tileSize.x
 }

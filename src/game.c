@@ -93,12 +93,14 @@ int main(int argc,char *argv[])
     //level = levelLoad("level/textLevel.level");
     
     //Entity* floor = entityNew(); //"models/dino/dino.json"
-    Model* floor = model_load("models/floor/floor.json");
-    Entity* wall = spawnWall(gfc_vector3d(0,0,-10),floor);
-    wall->rotation = gfc_vector3d(0,0,0);
+    //Model* floor = model_load("models/floor/floor.json");
+    //Entity* wall = spawnWall(gfc_vector3d(0,0,-10),floor);
+    //wall->rotation = gfc_vector3d(0,0,0);
 
-    //Model* dino = model_load("models/dino/dino.model");
-    //Entity* wall2 = spawnWall(gfc_vector3d(5,5,0),dino);
+    Model* dino = model_load("models/dino/dino.model");
+    Entity* wall2 = spawnWall(gfc_vector3d(5,5,0),dino);
+
+    //Entity* wall3 = spawnWall(gfc_vector3d(50, 50, 0), dino);
 
     level = levelLoadTest();
     
@@ -124,6 +126,7 @@ int main(int argc,char *argv[])
         entityUpdateAll();
         entityTouchAll();
         entityDrawAll();
+        levelDraw(level);
 
        
         //2D draws
