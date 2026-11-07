@@ -99,6 +99,8 @@ Entity* enemyEntityNew(GFC_Vector3D pos, int role)
 			break;
 	}
 
+	self->bounds = self->model->mesh->bounds;
+
 	return self;
 }
 
@@ -349,14 +351,15 @@ void enemyTouch(Entity* self, Entity* toucher)
 	//Check if we are touching
 	if (pX <= tX + tW && pX + pW >= tX && pY <= tY + tH && pY + pH >= tY && pZ <= tZ + tD && pZ + pD >= tZ)
 	{
+		//slog("TOUCHER ROLE: %i", toucher->role);
 		if (toucher->team == TEAM_PLAYER)
 		{
-			slog("ENEMY TOUCHED by player!");
+			//slog("ENEMY TOUCHED by player!");
 
-			self->hp--;
+			//self->hp--;
 			if (toucher->isProj)
 			{
-				slog("ENEMY TOUCHED PLAYER PROJ!");
+				//slog("ENEMY TOUCHED PLAYER PROJ!");
 				toucher->_inUse = 0;
 				
 			}

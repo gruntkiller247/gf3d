@@ -356,7 +356,7 @@ void playerTouch(Entity* self, Entity* toucher)
 		
 		if (toucher->team == TEAM_ENEMY)
 		{
-			slog("Player touched by enemy!");
+			//slog("Player touched by enemy!");
 			if (toucher->isProj)
 			{
 				toucher->_inUse = 0;

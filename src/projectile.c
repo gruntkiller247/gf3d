@@ -54,7 +54,7 @@ Entity* projectileEntityNew(GFC_Vector3D position, Uint8 team, Uint16 timeToLive
 
 	self->model = model_load("models/Cube/Cube.json");
 
-	
+	self->bounds = self->model->mesh->bounds;
 	
 	data->timeToLive = timeToLive;
 	data->timeToCount = 0;
@@ -85,6 +85,10 @@ void projectileThink(Entity* self)
 		self->_inUse = 0;
 		return;
 	}
+
+	//slog("Projectile bounds: %f %f %f",self->bounds.w,self->bounds.h,self->bounds.d);
+
+	//slog("MY TEAM IS: %i", self->team);
 }
 
 void projectileUpdate(Entity* self)
@@ -159,14 +163,13 @@ void projectileFree(Entity* self)
 	}
 }
 
-void projectileTouch(Entity* self)
+void projectileTouch(Entity* self, Entity* toucher)
 {
 	if (!self)
 	{
 		return;
 	}
-
-
+	
 }
 
 

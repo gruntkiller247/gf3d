@@ -21,7 +21,7 @@ void projectileUpdate(Entity* self);
 
 void projectileFree(Entity* self);
 
-void projectileTouch(Entity* self);
+void projectileTouch(Entity* self,Entity* toucher);
 
 /*
 	Recieves the direction to move in from another class!
