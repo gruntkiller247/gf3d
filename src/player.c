@@ -10,6 +10,7 @@
 #include "model.h"
 #include "level.h"
 #include "camera.h"
+#include "projectile.h"
 
 static Level* theLevel = NULL;
 //Setup gets + setters!
@@ -21,6 +22,7 @@ static Level* theLevel = NULL;
 void playerFree(Entity* self);
 void playerTouch(Entity* self, Entity* toucher);
 void playerDraw(Entity* self);
+GFC_Vector3D getForward(Entity* self);
 
 Entity* playerEntityNew(GFC_Vector3D position)
 {
@@ -273,16 +275,36 @@ void playerThink(Entity* self)
 
 void playerUpdate(Entity* self)
 {
+	PlayerData* data;
+	Entity* proj;
 	
-	if (!self || !self->data)
+	if (!self)
 	{
 		slog("Player does not exist in update!");
 		return NULL;
 	}
 	
+	data = (PlayerData*)self->data;
 
 
-	//gfc_input_key_pressed();
+	if (!data)
+	{
+		slog("Player does not have their data!");
+		return;
+	}
+
+
+	if (gfc_input_key_pressed("g"))
+	{
+		slog("Shooting test proj!");
+		proj = projectileEntityNew(self->position, self->team, TTL_PROJ_DEFAULT, ROLE_DEFAULT_PROJ);
+
+		if (proj)
+		{
+			projectileGiveMove(proj, getForward(self));
+		}
+	}
+	
 }
 
 void playerDraw(Entity* self)
@@ -397,3 +419,32 @@ void playerTouch(Entity* self, Entity* toucher)
 	}
 
 }
+
+GFC_Vector3D getForward(Entity* self)
+{
+	PlayerData* data;
+	GFC_Vector3D offset = { 0 };
+
+	if (!self)
+	{
+		return;
+	}
+
+	data = (PlayerData*)self->data;
+
+	if (!data)
+	{
+		return offset;
+	}
+
+	float yaw = data->playerRotation.x;
+	float pitch = data->playerRotation.y;
+	
+
+	offset.x = -1 * cosf(pitch) * sinf(yaw);
+	offset.y = cosf(pitch) * cosf(yaw);
+	offset.z = sinf(pitch);
+
+	return offset;
+}
+

@@ -77,13 +77,11 @@ void cameraThink(Entity* self)
 	float pitch = pData->playerRotation.y;
 	float distance = data->cameraFollowDistance;
 
-	//Uses spherical coordinates and trigonometric coordinate conversion
-	//Calculate the camera's horizontal distance and height
+	//Angles to cartisien coordinate calculation
 	offset.x = distance * cosf(pitch) * sinf(yaw);
 	offset.y = -distance * cosf(pitch) * cosf(yaw);
 	offset.z = distance * sinf(pitch);
 
-	//Place the camera relative to the player
 	gfc_vector3d_add(cameraPosition,player->position,offset);
 	
 

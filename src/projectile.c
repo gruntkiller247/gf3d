@@ -12,6 +12,7 @@ typedef struct
 	Uint16 timeToLive;
 	Uint16 timeToCount;
 
+	GFC_Vector3D currentDirection;
 }ProjData;
 
 void projectileThink(Entity* self);
@@ -31,7 +32,7 @@ Entity* projectileEntityNew(GFC_Vector3D position, Uint8 team, Uint16 timeToLive
 		slog("Failed to make a proj!");
 		return NULL;
 	}
-
+	self->data = malloc(sizeof(ProjData));
 	data = (ProjData*)self->data;
 
 	if (!data)
@@ -53,7 +54,8 @@ Entity* projectileEntityNew(GFC_Vector3D position, Uint8 team, Uint16 timeToLive
 
 	self->model = model_load("models/Cube/Cube.json");
 
-
+	
+	
 	data->timeToLive = timeToLive;
 	data->timeToCount = 0;
 
@@ -87,9 +89,60 @@ void projectileThink(Entity* self)
 
 void projectileUpdate(Entity* self)
 {
+	ProjData* data;
+	GFC_Vector3D moveV = { 0 };
+	GFC_Vector3D offset;
+
 	if (!self)
 	{
 		return;
+	}
+
+	data = (ProjData*)self->data;
+
+	if (!data)
+	{
+		return;
+	}
+
+	if (data->currentDirection.x != 0)
+	{
+		moveV.x = data->currentDirection.x;
+	}
+
+	if (data->currentDirection.y != 0)
+	{
+		moveV.y = data->currentDirection.y;
+	}
+
+	if ((moveV.x) || (moveV.y))
+	{
+		gfc_vector3d_normalize(&moveV);
+
+		//gfc_vector3d_rotate_about_z(&moveV, data->enemyRotation.x);
+
+		self->velocity = moveV;
+	}
+
+
+	gfc_vector3d_add(self->position, self->position, self->velocity);
+	offset = gfc_vector3d(0, 0, 100);
+
+
+	//gfc_vector3d_rotate_about_z(&offset, data->enemyRotation.x);
+	//self->rotation.z = data->enemyRotation.x;
+
+	//gfc_vector3d_rotate_about_x(&offset, data->enemyRotation.y);
+	//self->rotation.y = data->enemyRotation.y;
+
+	if (gfc_vector3d_magnitude_squared(self->velocity) > 0.1)
+	{
+		gfc_vector3d_scale(self->velocity, self->velocity, 0.8);
+	}
+	else
+	{
+		//slog("Clearing!");
+		gfc_vector3d_clear(self->velocity);
 	}
 }
 
@@ -114,4 +167,27 @@ void projectileTouch(Entity* self)
 	}
 
 
+}
+
+
+/*
+	Recieves itself and a PI direction
+*/
+void projectileGiveMove(Entity* self, GFC_Vector3D direction)
+{
+	ProjData* data;
+
+	if (!self)
+	{
+		return;
+	}
+
+	data = (ProjData*)self->data;
+
+	if (!data)
+	{
+		return;
+	}
+
+	data->currentDirection = direction;
 }
