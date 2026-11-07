@@ -55,6 +55,9 @@ typedef enum role_s
 	ROLE_TRASH,
 	ROLE_SUICIDER,
 	ROLE_STATION,
+	ROLE_MOTHER,
+	ROLE_FLY_SNIP,
+
 
 }Role;
 

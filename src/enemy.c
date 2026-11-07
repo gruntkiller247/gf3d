@@ -2,6 +2,16 @@
 #include "enemy.h"
 #include "projectile.h"
 
+typedef enum
+{
+	MS_ERROR = -1,
+	MS_IDLE = 0,
+	MS_MOVE,
+	MS_FLY,
+	MS_SHOOT,
+
+}MonsterState;
+
 typedef struct Enemy_S
 {
 	Uint8 lastDirection;
@@ -14,6 +24,16 @@ typedef struct Enemy_S
 
 	GFC_Vector3D lookAt;
 
+	Uint8 motherTimer;
+	Uint16 motherMax;
+	Uint8 state;
+
+	Uint8 shootTimer;
+	Uint8 shootMax;
+
+	//Uint8 maxFlightHeight;  //Z axis
+	GFC_Vector3D maxDistFromPlayer;
+
 }EnemyData;
 
 void enemyThink(Entity* self);
@@ -24,7 +44,7 @@ void moveRandom(Entity* self, Uint8 direction);
 GFC_Vector3D move(Entity* self, Uint8 direction, GFC_Vector3D move);
 
 
-Entity* enemyEntityNew(GFC_Vector3D pos, int role)
+Entity* enemyEntityNew(GFC_Vector3D pos, Uint8 role)
 {
 	Entity* self;
 	EnemyData* data;
@@ -68,11 +88,14 @@ Entity* enemyEntityNew(GFC_Vector3D pos, int role)
 	data->enemyRotation.x = 0;
 	data->enemyRotation.y = GFC_PI / 6;
 
+	
+
+
 	switch (role)
 	{
 		case ROLE_TRASH:
 
-			self->model = model_load("models/dino/dino.model");
+			self->model = model_load("models/dino/dino.json");
 			self->color = GFC_COLOR_RED;
 			self->maxHp = 1;
 			self->hp = self->maxHp;
@@ -99,16 +122,43 @@ Entity* enemyEntityNew(GFC_Vector3D pos, int role)
 			self->hp = self->maxHp;
 			self->damage = 1;
 
-			data->moveMax = 10;
+			data->shootMax = 10;
 			data->lookAt = getPlayer()->position;
 
 
+			break;
+
+		case ROLE_MOTHER:
+			self->model = model_load("models/dino/dino.json");
+			self->color = GFC_COLOR_GREEN;
+			self->maxHp = 1;
+			self->hp = self->maxHp;
+			self->damage = 1;
+
+			data->motherMax = 200;
+
+			break;
+
+		case ROLE_FLY_SNIP:
+			self->model = model_load("models/dino/dino.json");//model_load("models/dino/dino.model");
+			self->color = GFC_COLOR_BLUE;
+			self->maxHp = 1;
+			self->hp = self->maxHp;
+			self->damage = 1;
+
+			data->shootMax = 10;
+			data->maxDistFromPlayer = gfc_vector3d(10,10,10);
+
+			//data->maxFlightHeight = 20;
+			data->state = MS_FLY;
+			data->moveMax = 10;
+			data->lookAt = getPlayer()->position;
 			break;
 		
 		default:
 
 			slog("Default Enemy role!");
-			self->model = model_load("models/dino/dino.model");
+			self->model = model_load("models/dino/dino.json");
 
 			break;
 	}
@@ -140,9 +190,13 @@ void enemyThink(Entity* self)
 	}
 
 	data->moveTimer++;
+	data->shootTimer++;
 
 	switch (self->role)
 	{
+		case ROLE_MOTHER:
+			//Same movement as trash
+			data->motherTimer++;
 		case ROLE_TRASH:
 
 			if (data->moveTimer >= data->moveMax)
@@ -196,11 +250,23 @@ void enemyThink(Entity* self)
 			}
 
 			break;
+		case ROLE_FLY_SNIP:
+
+
+			if (self->position.z >= data->maxDistFromPlayer.z)
+			{
+				//State should be to shoot
+				data->state = MS_SHOOT;
+			}
+			else
+			{
+				data->state = MS_FLY;
+			}
 
 		case ROLE_SUICIDER:
-			data->lookAt = getPlayer()->position;
+			//data->lookAt = getPlayer()->position;
 
-			break;
+			
 
 		case ROLE_STATION:
 			data->lookAt = getPlayer()->position;
@@ -244,6 +310,15 @@ void enemyUpdate(Entity* self)
 
 	switch (self->role)
 	{
+		case ROLE_MOTHER:
+			//Same movement as trash
+
+			if (data->motherTimer >= data->motherMax)
+			{
+				data->motherTimer = 0;
+				enemyEntityNew(self->position,ROLE_TRASH);
+			}
+
 		case ROLE_TRASH:
 			moveV = move(self, data->currentDirection, moveV);
 			break;
@@ -280,9 +355,9 @@ void enemyUpdate(Entity* self)
 		case ROLE_STATION:
 			//Spawn a projectile and have it move in a direction towards the player!
 
-			if (data->moveTimer >= data->moveMax)
+			if (data->shootTimer >= data->shootMax)
 			{
-				data->moveTimer = 0;
+				data->shootTimer = 0;
 				proj = projectileEntityNew(self->position, self->team, TTL_PROJ_DEFAULT, ROLE_DEFAULT_PROJ);
 				
 				if (proj)
@@ -294,6 +369,58 @@ void enemyUpdate(Entity* self)
 					projectileGiveMove(proj,temp);
 				}
 			}
+
+		case ROLE_FLY_SNIP:
+
+			switch (data->state)
+			{
+				case MS_FLY:
+					//slog("I AM FLYING!");
+					
+					if (data->moveTimer >= data->moveMax)
+					{
+						//slog("I AM FLYING AND MOVING!");
+						
+						data->moveTimer = 0;
+						GFC_Vector3D temp = self->position;
+
+						
+						if (temp.z <= data->maxDistFromPlayer.z)
+						{
+							moveV.z = 1;
+						}
+						else
+						{
+							moveV.z = 0;
+						}
+
+
+					}
+					break;
+
+				case MS_SHOOT:
+					if (data->shootTimer >= data->shootMax)
+					{
+						data->shootTimer = 0;
+						proj = projectileEntityNew(self->position, self->team, TTL_PROJ_DEFAULT, ROLE_DEFAULT_PROJ);
+
+						if (proj)
+						{
+							gfc_vector3d_sub(temp, getPlayer()->position, self->position);
+
+
+							//slog("\nWhere I think the player is!\nX: %f\nY: %f", temp.x, temp.y);
+							projectileGiveMove(proj, temp);
+						}
+					}
+					break;
+
+				default:
+					slog("I am some other state!");
+					break;
+			}
+			
+			break;
 
 
 
@@ -313,6 +440,18 @@ void enemyUpdate(Entity* self)
 		gfc_vector3d_rotate_about_z(&moveV, data->enemyRotation.x);
 
 		self->velocity = moveV;
+	}
+
+	if (moveV.z)
+	{
+		if (moveV.z > 0)
+		{
+			self->position.z++;
+		}
+		else
+		{
+			self->position.z--;
+		}
 	}
 
 

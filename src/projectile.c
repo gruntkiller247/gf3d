@@ -119,7 +119,12 @@ void projectileUpdate(Entity* self)
 		moveV.y = data->currentDirection.y;
 	}
 
-	if ((moveV.x) || (moveV.y))
+	if (data->currentDirection.z != 0)
+	{
+		moveV.z = data->currentDirection.z;
+	}
+
+	if ((moveV.x) || (moveV.y) || (moveV.z))
 	{
 		//slog("\nPROJ MOVE:\nX: %f\nY: %f",moveV.x,moveV.y);
 		gfc_vector3d_normalize(&moveV);

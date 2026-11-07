@@ -226,7 +226,7 @@ void entityTouch(Entity* self, Entity* toucher)
 		//slog("Entity has no touch!");
 	}
 
-	
+		
 	if (toucher->touch)
 	{
 		toucher->touch(toucher, self);

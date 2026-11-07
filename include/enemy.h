@@ -4,7 +4,7 @@
 #include "entity.h"
 #include "model.h"
 
-Entity* enemyEntityNew(GFC_Vector3D pos, int role);
+Entity* enemyEntityNew(GFC_Vector3D pos, Uint8 role);
 
 void enemyThink(Entity* self);
 

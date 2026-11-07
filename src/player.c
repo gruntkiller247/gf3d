@@ -41,7 +41,7 @@ Entity* playerEntityNew(GFC_Vector3D position)
 		return NULL;
 	}
 
-	self->model = model_load("models/dino/dino.model");
+	self->model = model_load("models/dino/dino.json");
 	self->position = position;
 	self->think = playerThink;
 	self->update = playerUpdate;
