@@ -296,7 +296,7 @@ void playerUpdate(Entity* self)
 	}
 
 
-	if (gfc_input_key_pressed("g"))
+	if (gfc_input_key_pressed("f"))
 	{
 		//Shooting a 'gun'
 		//slog("Shooting test proj!");
@@ -313,9 +313,13 @@ void playerUpdate(Entity* self)
 		gfc_vector3d_add(temp,temp,self->position);
 		proj = projectileEntityNew(temp, self->team, TTL_PROJ_MELEE, ROLE_DEFAULT_PROJ);
 	}
-	else if (gfc_input_key_pressed("f"))
+	else if (gfc_input_key_pressed("g"))
 	{
 		proj = bombEntityNew(self->position,self->team,TTL_BOMB_DEFAULT,ROLE_DEFAULT_BOMB);
+	}
+	else if (gfc_input_key_pressed("b"))
+	{
+		proj = bombEntityNew(self->position, self->team, TTL_BOMB_LAVA, ROLE_LAVA_BOMB);
 	}
 	else
 	{

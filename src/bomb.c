@@ -6,6 +6,8 @@ typedef struct
 {
 	Uint16 timeToLive;
 	Uint16 timeToCount;
+
+	Uint16 numExplosions;
 }BombData;
 
 void bombThink(Entity* self);
@@ -35,6 +37,16 @@ Entity* bombEntityNew(GFC_Vector3D position, Uint8 team, Uint16 timeToLive, Uint
 	{
 		slog("Failed to make bomb data!");
 		return NULL;
+	}
+
+	switch (role)
+	{
+		case ROLE_LAVA_BOMB:
+			data->numExplosions = 3;
+			break;
+
+		default:
+			data->numExplosions = 1;
 	}
 
 	self->position = position;
@@ -74,7 +86,9 @@ void bombThink(Entity* self)
 		slog("Fail data 1");
 		return;
 	}
-	slog("Time: %i",data->timeToCount);
+
+	//slog("Time: %i",data->timeToCount);
+	
 	data->timeToCount++;
 	
 }
@@ -128,6 +142,7 @@ void bombTouch(Entity* self, Entity* toucher)
 
 void explode(Entity* self)
 {
+	BombData* data;
 	Entity* proj;
 	GFC_Vector3D temp = { 0 };
 	int c = 0;
@@ -138,7 +153,23 @@ void explode(Entity* self)
 	}
 	//slog("I AM THE BOMB AND I AM BLOWING UP!");
 
-	self->_inUse = 0;
+	data = (BombData*)self->data;
+
+	if (!data)
+	{
+		slog("Fail data");
+		return;
+	}
+	if (data->numExplosions > 0)
+	{
+		data->numExplosions--;
+		data->timeToCount = 0;
+	}
+	else
+	{
+		self->_inUse = 0;
+	}
+	
 
 	for (c = 0; c < 8; c++)
 	{
