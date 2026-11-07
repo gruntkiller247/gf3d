@@ -52,6 +52,8 @@ Entity* playerEntityNew(GFC_Vector3D position)
 	self->role = ROLE_PLAYER;
 	self->velocityLastFrame = gfc_vector3d(0,0,0);
 
+	self->maxHp = 3;
+	self->hp = self->maxHp;
 
 	//GFC Box has a bounds. x,y,z w,h,d
 	//x,y,z are the minimum positions of the box

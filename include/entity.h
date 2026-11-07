@@ -49,6 +49,7 @@ typedef enum role_s
 	ROLE_FLOOR,
 
 	ROLE_TRASH,
+	ROLE_SUICIDER,
 	ROLE_STATION,
 
 }Role;
@@ -84,8 +85,16 @@ typedef struct Entity_S
 	void		(*touch)(struct Entity_S* self, struct Entity_S* toucher);
 	void* data;								//Used for custom data. Must create a free function for it!
 
+	
+
 	GFC_TextLine	name;
 	Uint8 directionLooking;
+
+	Uint8 hp;
+	Uint8 maxHp;
+
+	Uint8 isInvul;
+	Uint8 damage;
 
 }Entity;
 

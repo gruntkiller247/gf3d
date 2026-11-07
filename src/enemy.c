@@ -11,6 +11,8 @@ typedef struct Enemy_S
 
 	GFC_Vector2D enemyRotation;
 
+	GFC_Vector3D lookAt;
+
 }EnemyData;
 
 void enemyThink(Entity* self);
@@ -71,6 +73,21 @@ Entity* enemyEntityNew(GFC_Vector3D pos, int role)
 
 			self->model = model_load("models/dino/dino.model");
 			self->color = GFC_COLOR_RED;
+			self->maxHp = 1;
+			self->hp = self->maxHp;
+			self->damage = 1;
+			
+			break;
+
+		case ROLE_SUICIDER:
+			self->model = model_load("models/dino/dino.model");
+			self->color = GFC_COLOR_ORANGE;
+			self->maxHp = 1;
+			self->hp = self->maxHp;
+			self->damage = 1;
+
+			data->moveMax = 10;
+			data->lookAt = getPlayer()->position;
 
 			break;
 		
@@ -94,9 +111,72 @@ void enemyThink(Entity* self)
 		return;
 	}
 
+	data = (EnemyData*)self->data;
+
+	if (!data)
+	{
+		return;
+	}
+	data->moveTimer++;
+
 	switch (self->role)
 	{
 		case ROLE_TRASH:
+
+			if (data->moveTimer >= data->moveMax)
+			{
+				data->moveTimer = 0;
+
+				switch (self->role)
+				{
+
+					default:
+						switch (data->lastDirection)
+						{
+						case D_NORTH:
+
+							moveRandom(self, D_NORTH);
+
+							break;
+
+						case D_NORTHEAST:
+							moveRandom(self, D_NORTHEAST);
+							break;
+
+						case D_EAST:
+							moveRandom(self, D_EAST);
+							break;
+
+						case D_SOUTHEAST:
+							moveRandom(self, D_SOUTHEAST);
+							break;
+
+						case D_SOUTH:
+							moveRandom(self, D_SOUTH);
+							break;
+
+						case D_SOUTHWEST:
+							moveRandom(self, D_SOUTHWEST);
+							break;
+
+						case D_WEST:
+							moveRandom(self, D_WEST);
+							break;
+
+						case D_NORTHWEST:
+							moveRandom(self, D_NORTHWEST);
+							break;
+
+						default:
+							slog("Monster does not have Last Direction!");
+						}
+				}
+			}
+
+			break;
+
+		case ROLE_SUICIDER:
+			data->lookAt = getPlayer()->position;
 
 			break;
 
@@ -106,67 +186,6 @@ void enemyThink(Entity* self)
 			break;
 	}
 
-	data = (EnemyData*)self->data;
-
-	if (!data)
-	{
-		return;
-	}
-
-
-	data->moveTimer++;
-
-
-
-	if (data->moveTimer >= data->moveMax)
-	{
-		data->moveTimer = 0;
-
-		switch (self->role)
-		{
-
-		default:
-			switch (data->lastDirection)
-			{
-			case D_NORTH:
-
-				moveRandom(self, D_NORTH);
-
-				break;
-
-			case D_NORTHEAST:
-				moveRandom(self, D_NORTHEAST);
-				break;
-
-			case D_EAST:
-				moveRandom(self, D_EAST);
-				break;
-
-			case D_SOUTHEAST:
-				moveRandom(self, D_SOUTHEAST);
-				break;
-
-			case D_SOUTH:
-				moveRandom(self, D_SOUTH);
-				break;
-
-			case D_SOUTHWEST:
-				moveRandom(self, D_SOUTHWEST);
-				break;
-
-			case D_WEST:
-				moveRandom(self, D_WEST);
-				break;
-
-			case D_NORTHWEST:
-				moveRandom(self, D_NORTHWEST);
-				break;
-
-			default:
-				slog("Monster does not have Last Direction!");
-			}
-		}
-	}
 
 	
 }
@@ -190,7 +209,46 @@ void enemyUpdate(Entity* self)
 		return;
 	}
 
-	moveV = move(self,data->currentDirection,moveV);
+	switch (self->role)
+	{
+		case ROLE_TRASH:
+			moveV = move(self, data->currentDirection, moveV);
+			break;
+
+		case ROLE_SUICIDER:
+			if (data->moveTimer >= data->moveMax)
+			{
+				data->moveTimer = 0;
+				GFC_Vector3D temp = self->position;
+
+				if (temp.x > data->lookAt.x)
+				{
+					moveV.x = -1;
+				}
+				else
+				{
+					moveV.x = 1;
+				}
+
+				if (temp.y > data->lookAt.y)
+				{
+					moveV.y = -1;
+				}
+				else
+				{
+					moveV.y = 1;
+				}
+
+
+			}
+
+			break;
+		default:
+			slog("NO MOVEMENT ROLE CHECK!");
+			break;
+	}
+
+
 	//slog("Move X: %f\nMove Y: %f ", moveV.x, moveV.y);
 	
 	if ((moveV.x) || (moveV.y))
@@ -342,6 +400,10 @@ void enemyTouch(Entity* self, Entity* toucher)
 	}
 }
 
+/*
+	Determins what direction the monster should be moving in
+	Called in monnster Think!
+*/
 void moveRandom(Entity* self, Uint8 direction)
 {
 	if (!self)
@@ -429,6 +491,7 @@ void moveRandom(Entity* self, Uint8 direction)
 
 /*
 	Adds the enemy's movement instructions to the move vector
+	Called in monster Update
 */
 GFC_Vector3D move(Entity* self, Uint8 direction, GFC_Vector3D move)
 {

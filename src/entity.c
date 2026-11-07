@@ -14,6 +14,7 @@ typedef struct
 	Entity* entityList;
 	Uint32 maxEnts;
 
+
 }EntityManager;
 
 static EntityManager entityManager = { 0 };
