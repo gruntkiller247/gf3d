@@ -263,6 +263,58 @@ void enemyThink(Entity* self)
 				data->state = MS_FLY;
 			}
 
+			if (data->moveTimer >= data->moveMax)
+			{
+				//data->moveTimer = 0;
+
+				switch (self->role)
+				{
+
+				default:
+					switch (data->lastDirection)
+					{
+					case D_NORTH:
+
+						moveRandom(self, D_NORTH);
+
+						break;
+
+					case D_NORTHEAST:
+						moveRandom(self, D_NORTHEAST);
+						break;
+
+					case D_EAST:
+						moveRandom(self, D_EAST);
+						break;
+
+					case D_SOUTHEAST:
+						moveRandom(self, D_SOUTHEAST);
+						break;
+
+					case D_SOUTH:
+						moveRandom(self, D_SOUTH);
+						break;
+
+					case D_SOUTHWEST:
+						moveRandom(self, D_SOUTHWEST);
+						break;
+
+					case D_WEST:
+						moveRandom(self, D_WEST);
+						break;
+
+					case D_NORTHWEST:
+						moveRandom(self, D_NORTHWEST);
+						break;
+
+					default:
+						slog("Monster does not have Last Direction!");
+					}
+				}
+			}
+
+
+
 		case ROLE_SUICIDER:
 			//data->lookAt = getPlayer()->position;
 
@@ -299,7 +351,7 @@ void enemyUpdate(Entity* self)
 	{
 		return;
 	}
-
+	
 
 	data = (EnemyData*)self->data;
 
@@ -376,6 +428,7 @@ void enemyUpdate(Entity* self)
 			{
 				case MS_FLY:
 					//slog("I AM FLYING!");
+					moveV = move(self, data->currentDirection, moveV);
 					
 					if (data->moveTimer >= data->moveMax)
 					{
@@ -393,7 +446,8 @@ void enemyUpdate(Entity* self)
 						{
 							moveV.z = 0;
 						}
-
+						//TODO FIGURE OUT WHY THIS NOT WORKING!
+						//moveV = move(self, data->currentDirection, moveV);
 
 					}
 					break;
@@ -401,6 +455,10 @@ void enemyUpdate(Entity* self)
 				case MS_SHOOT:
 					if (data->shootTimer >= data->shootMax)
 					{
+						moveV = move(self, data->currentDirection, moveV);
+						moveV.z -= self->position.z;
+						
+
 						data->shootTimer = 0;
 						proj = projectileEntityNew(self->position, self->team, TTL_PROJ_DEFAULT, ROLE_DEFAULT_PROJ);
 
