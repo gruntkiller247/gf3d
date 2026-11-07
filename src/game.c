@@ -109,7 +109,7 @@ int main(int argc,char *argv[])
     //Entity* enemy2 = enemyEntityNew(gfc_vector3d(20, 20, 0), ROLE_TRASH);
     //Entity* enemy3 = enemyEntityNew(gfc_vector3d(20, 20, 0), ROLE_STATION);
     //Entity* enemy4 = enemyEntityNew(gfc_vector3d(20, 20, 0), ROLE_MOTHER);
-    Entity* enemy5 = enemyEntityNew(gfc_vector3d(20, 20, 0), ROLE_FLY_SNIP);
+    //Entity* enemy5 = enemyEntityNew(gfc_vector3d(20, 20, 0), ROLE_FLY_SNIP);
 
     // main game loop    
     while(!_done)

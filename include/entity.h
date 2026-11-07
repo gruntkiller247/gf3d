@@ -22,6 +22,17 @@ typedef enum DS
 
 typedef enum
 {
+	TTL_ZERO_BOMB = 0,
+	TTL_BOMB_DEFAULT = 50,
+	TTL_BOMB_MELEE = 5,
+	TTL_ZERO_PROJ = 0,
+	TTL_PROJ_DEFAULT = 100,
+	TTL_PROJ_MELEE = 5,
+
+}TimeToLive;
+
+typedef enum
+{
 	LD_North = 0,
 	LD_East,
 	LD_South,
@@ -51,6 +62,7 @@ typedef enum role_s
 	ROLE_FLOOR,
 
 	ROLE_DEFAULT_PROJ,
+	ROLE_DEFAULT_BOMB,
 
 	ROLE_TRASH,
 	ROLE_SUICIDER,

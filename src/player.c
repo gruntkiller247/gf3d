@@ -11,6 +11,7 @@
 #include "level.h"
 #include "camera.h"
 #include "projectile.h"
+#include "bomb.h"
 
 static Level* theLevel = NULL;
 //Setup gets + setters!
@@ -277,6 +278,7 @@ void playerUpdate(Entity* self)
 {
 	PlayerData* data;
 	Entity* proj;
+	GFC_Vector3D temp;
 	
 	if (!self)
 	{
@@ -296,6 +298,7 @@ void playerUpdate(Entity* self)
 
 	if (gfc_input_key_pressed("g"))
 	{
+		//Shooting a 'gun'
 		//slog("Shooting test proj!");
 		proj = projectileEntityNew(self->position, self->team, TTL_PROJ_DEFAULT, ROLE_DEFAULT_PROJ);
 
@@ -303,6 +306,20 @@ void playerUpdate(Entity* self)
 		{
 			projectileGiveMove(proj, getForward(self));
 		}
+	}
+	else if (gfc_input_key_pressed("v"))
+	{
+		temp = getForward(self);
+		gfc_vector3d_add(temp,temp,self->position);
+		proj = projectileEntityNew(temp, self->team, TTL_PROJ_MELEE, ROLE_DEFAULT_PROJ);
+	}
+	else if (gfc_input_key_pressed("f"))
+	{
+		proj = bombEntityNew(self->position,self->team,TTL_BOMB_DEFAULT,ROLE_DEFAULT_BOMB);
+	}
+	else
+	{
+
 	}
 	
 }
@@ -450,7 +467,7 @@ GFC_Vector3D getForward(Entity* self)
 
 	offset.x = -1 * cosf(pitch) * sinf(yaw);
 	offset.y = cosf(pitch) * cosf(yaw);
-	offset.z = sinf(pitch);
+	offset.z = -1 * sinf(pitch);
 
 	return offset;
 }

@@ -222,6 +222,9 @@
     <ClInclude Include="..\include\projectile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\bomb.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\game.c">
@@ -411,6 +414,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\projectile.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\bomb.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
