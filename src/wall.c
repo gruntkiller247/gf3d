@@ -19,28 +19,12 @@ Entity* spawnWall(GFC_Vector3D position, Model* model)
 
 	self->model = model;
 	self->position = position;
-	self->touch = wallTouch;
 	self->bounds = self->model->mesh->bounds;
-	self->team = TEAM_WALL;
+	self->team = TEAM_IGNORE;
+	self -> role = ROLE_WALL;
 
 	self->bounds = self->model->mesh->bounds;
 
 	return self;
 
-}
-
-void wallTouch(Entity* self, Entity* toucher)
-{
-	if (!self || !toucher)
-	{
-		return;
-	}
-
-	//Do Wall touching!
-
-	if(toucher->team != TEAM_WALL)
-	{
-		slog("Something is touching a wall!");
-		//hitWall(toucher);
-	}
 }

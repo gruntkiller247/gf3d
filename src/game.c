@@ -27,6 +27,7 @@
 #include "wall.h"
 #include "camera.h"
 #include "level.h"
+#include "enemy.h"
 
 extern int __DEBUG;
 
@@ -97,12 +98,14 @@ int main(int argc,char *argv[])
     //Entity* wall = spawnWall(gfc_vector3d(0,0,-10),floor);
     //wall->rotation = gfc_vector3d(0,0,0);
 
-    Model* dino = model_load("models/dino/dino.model");
+    //Model* dino = model_load("models/dino/dino.model");
     //Entity* wall2 = spawnWall(gfc_vector3d(5,5,0),dino);
 
     //Entity* wall3 = spawnWall(gfc_vector3d(50, 50, 0), dino);
 
     level = levelLoadTest();
+
+    Entity* enemy = enemyEntityNew(gfc_vector3d(0,0,0), ROLE_TRASH);
     
 
     // main game loop    

@@ -248,6 +248,7 @@ void entityTouchAll()
 		if (entityManager.entityList[c].team == TEAM_IGNORE)
 			continue;
 
+
 		for (d = c + 1; d < entityManager.maxEnts; d++)
 		{
 			if (!entityManager.entityList[d]._inUse)

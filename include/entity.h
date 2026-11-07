@@ -5,6 +5,21 @@
 #include "gfc_color.h"
 #include "level.h"
 
+typedef enum DS
+{
+	D_NONE = -1,
+	D_NORTH = 0,
+	D_NORTHEAST,
+	D_EAST,
+	D_SOUTHEAST,
+	D_SOUTH,
+	D_SOUTHWEST,
+	D_WEST,
+	D_NORTHWEST,
+	D_MAX
+
+}Directions;
+
 typedef enum
 {
 	LD_North = 0,
@@ -19,11 +34,24 @@ typedef enum
 {
 	TEAM_NONE,
 	TEAM_PLAYER,
-	TEAM_WALL,
 	TEAM_ENEMY,
 	TEAM_IGNORE,
 	TEAM_ITEM
 }Teams;
+
+typedef enum role_s
+{
+	ROLE_ERROR = -1,
+	ROLE_NONE,
+
+	ROLE_PLAYER,
+	ROLE_WALL,
+	ROLE_FLOOR,
+
+	ROLE_TRASH,
+	ROLE_STATION,
+
+}Role;
 
 
 typedef struct Entity_S
@@ -34,6 +62,7 @@ typedef struct Entity_S
 	Uint32			layer;
 	Uint8			team;
 	Uint32			id;
+	Uint32			role;
 
 
 	GFC_Vector3D	position;

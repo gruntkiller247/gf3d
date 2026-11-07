@@ -44,11 +44,12 @@ Entity* playerEntityNew(GFC_Vector3D position)
 	self->think = playerThink;
 	self->update = playerUpdate;
 
-	self->data = gfc_allocate_array(sizeof(PlayerData), 1);
+	self->data = malloc(sizeof(PlayerData));
 	self->free = playerFree;
 	self->touch = playerTouch;
 	self->draw = playerDraw;
 	self->team = TEAM_PLAYER;
+	self->role = ROLE_PLAYER;
 	self->velocityLastFrame = gfc_vector3d(0,0,0);
 
 
@@ -238,8 +239,10 @@ void playerThink(Entity* self)
 
 		gfc_vector3d_rotate_about_z(&move, data->playerRotation.x);
 
-		self->velocityLastFrame = self->velocityLastFrame;
+		
+		//self->velocityLastFrame = self->velocityLastFrame;
 		self->velocity = move;
+		
 	}
 
 	gfc_vector3d_add(self->position, self->position, self->velocity);

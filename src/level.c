@@ -356,7 +356,7 @@ Level* levelLoadTest()
 
 		//y = tempTile->bounds.y + tempTile->bounds.h;
 
-		slog("\nX pos: %i\nY pos: %i\nZ pos: %i", x, y, z);
+		//slog("\nX pos: %i\nY pos: %i\nZ pos: %i", x, y, z);
 		//Create each entity based on the json map read/RNG. For now everything is just default tile
 		gfc_list_append(level->floorPlan, tempTile);
 		//slog("X: %i", x);

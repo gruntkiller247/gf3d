@@ -19,7 +19,7 @@ Entity* tileEntityNew(int role, GFC_Vector3D pos)
 		return NULL;
 	}
 
-	
+	tile->role = ROLE_FLOOR;
 	//tile->draw = tileDraw;
 
 	gfc_vector3d_copy(tile->position,pos);

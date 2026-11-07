@@ -1,0 +1,517 @@
+#include "simple_logger.h"
+#include "enemy.h"
+
+typedef struct Enemy_S
+{
+	Uint8 lastDirection;
+	Uint8 currentDirection;
+
+	Uint8 moveTimer;
+	Uint8 moveMax;
+
+	GFC_Vector2D enemyRotation;
+
+}EnemyData;
+
+void enemyThink(Entity* self);
+void enemyUpdate(Entity* self);
+void enemyFree(Entity* self);
+void enemyTouch(Entity* self, Entity* toucher);
+void moveRandom(Entity* self, Uint8 direction);
+GFC_Vector3D move(Entity* self, Uint8 direction, GFC_Vector3D move);
+
+
+Entity* enemyEntityNew(GFC_Vector3D pos, int role)
+{
+	Entity* self;
+	EnemyData* data;
+
+	self = entityNew();
+
+	if (!self)
+	{
+		slog("Failed to make enemy!");
+		return NULL;
+	}
+
+	gfc_vector3d_copy(self->position, pos);
+
+	self->role = role;
+	self->team = TEAM_ENEMY;
+
+	self->think = enemyThink;
+	self->touch = enemyTouch;
+	self->update = enemyUpdate;
+	self->free = enemyFree;
+
+
+	self->data = malloc(sizeof(EnemyData));
+
+	data = (EnemyData*)self->data;
+
+	if (!data)
+	{
+		slog("Failed to make Player Data!");
+		return NULL;
+	}
+
+
+	data->lastDirection = rand() % D_MAX;
+	data->currentDirection = rand() % D_MAX;
+
+	data->moveTimer = 0;
+	data->moveMax = 100;
+
+	data->enemyRotation.x = 0;
+	data->enemyRotation.y = GFC_PI / 6;
+
+	switch (role)
+	{
+		case ROLE_TRASH:
+
+			self->model = model_load("models/dino/dino.model");
+			self->color = GFC_COLOR_RED;
+
+			break;
+		
+		default:
+
+			slog("Default Enemy role!");
+			self->model = model_load("models/dino/dino.model");
+
+			break;
+	}
+
+	return self;
+}
+
+void enemyThink(Entity* self)
+{
+	EnemyData* data;
+
+	if (!self)
+	{
+		return;
+	}
+
+	switch (self->role)
+	{
+		case ROLE_TRASH:
+
+			break;
+
+		default:
+
+			slog("Enemy has no role!");
+			break;
+	}
+
+	data = (EnemyData*)self->data;
+
+	if (!data)
+	{
+		return;
+	}
+
+
+	data->moveTimer++;
+
+
+
+	if (data->moveTimer >= data->moveMax)
+	{
+		data->moveTimer = 0;
+
+		switch (self->role)
+		{
+
+		default:
+			switch (data->lastDirection)
+			{
+			case D_NORTH:
+
+				moveRandom(self, D_NORTH);
+
+				break;
+
+			case D_NORTHEAST:
+				moveRandom(self, D_NORTHEAST);
+				break;
+
+			case D_EAST:
+				moveRandom(self, D_EAST);
+				break;
+
+			case D_SOUTHEAST:
+				moveRandom(self, D_SOUTHEAST);
+				break;
+
+			case D_SOUTH:
+				moveRandom(self, D_SOUTH);
+				break;
+
+			case D_SOUTHWEST:
+				moveRandom(self, D_SOUTHWEST);
+				break;
+
+			case D_WEST:
+				moveRandom(self, D_WEST);
+				break;
+
+			case D_NORTHWEST:
+				moveRandom(self, D_NORTHWEST);
+				break;
+
+			default:
+				slog("Monster does not have Last Direction!");
+			}
+		}
+	}
+
+	
+}
+
+void enemyUpdate(Entity* self)
+{
+	EnemyData* data;
+	GFC_Vector3D moveV = { 0 };
+	GFC_Vector3D offset;
+	
+	if (!self)
+	{
+		return;
+	}
+
+
+	data = (EnemyData*)self->data;
+
+	if (!data)
+	{
+		return;
+	}
+
+	moveV = move(self,data->currentDirection,moveV);
+	//slog("Move X: %f\nMove Y: %f ", moveV.x, moveV.y);
+	
+	if ((moveV.x) || (moveV.y))
+	{
+		gfc_vector3d_normalize(&moveV);
+
+		gfc_vector3d_rotate_about_z(&moveV, data->enemyRotation.x);
+
+		self->velocity = moveV;
+	}
+
+
+	gfc_vector3d_add(self->position, self->position, self->velocity);
+	offset = gfc_vector3d(0, 0, 100);
+	
+
+	gfc_vector3d_rotate_about_z(&offset, data->enemyRotation.x);
+	self->rotation.z = data->enemyRotation.x;
+	
+	gfc_vector3d_rotate_about_x(&offset, data->enemyRotation.y);
+	self->rotation.y = data->enemyRotation.y;
+
+	if (gfc_vector3d_magnitude_squared(self->velocity) > 0.1)
+	{
+		gfc_vector3d_scale(self->velocity, self->velocity, 0.8);
+	}
+	else
+	{
+		//slog("Clearing!");
+		gfc_vector3d_clear(self->velocity);
+	}
+
+
+
+	
+	
+}
+
+void enemyFree(Entity* self)
+{
+	if (!self)
+	{
+		return;
+	}
+
+	if (self->data)
+	{
+		free(self->data);
+		self->data = NULL;
+	}
+}
+
+void enemyTouch(Entity* self, Entity* toucher)
+{
+	if (!self || !toucher)
+	{
+		return;
+	}
+	//Player's box
+	//Min num
+	float pX, pY, pZ;
+	float pW, pH, pD;
+	//Max num are the aboves combined
+
+	//Toucher's box
+	//Min nums
+	float tX, tY, tZ;
+	float tW, tH, tD;
+	//Max num are the aboves combined
+
+	if (!self || !toucher)
+	{
+		slog("Player is trying to touch/be touched by an error!");
+		return;
+	}
+
+	pX = self->bounds.x + self->position.x;
+	pY = self->bounds.y + self->position.y;
+	pZ = self->bounds.z + self->position.z;
+	pW = self->bounds.w;
+	pH = self->bounds.h;
+	pD = self->bounds.d;
+
+	tX = toucher->bounds.x + toucher->position.x;
+	tY = toucher->bounds.y + toucher->position.y;
+	tZ = toucher->bounds.z + toucher->position.z;
+	tW = toucher->bounds.w;
+	tH = toucher->bounds.h;
+	tD = toucher->bounds.d;
+
+	//Check if we are touching
+	if (pX <= tX + tW && pX + pW >= tX && pY <= tY + tH && pY + pH >= tY && pZ <= tZ + tD && pZ + pD >= tZ)
+	{
+		//Calculate overlap on each axis
+		float overlapX = (pX + pW) - tX;
+		float overlapY = (pY + pH) - tY;
+		float overlapZ = (pZ + pD) - tZ;
+
+		//Also calculate overlap from the opposite direction
+		float overlapX2 = (tX + tW) - pX;
+		float overlapY2 = (tY + tH) - pY;
+		float overlapZ2 = (tZ + tD) - pZ;
+
+		if (overlapX > overlapX2)
+		{
+			overlapX = overlapX2;
+		}
+
+		if (overlapY > overlapY2)
+		{
+			overlapY = overlapY2;
+		}
+
+		if (overlapZ > overlapZ2)
+		{
+			overlapZ = overlapZ2;
+		}
+
+		if (overlapX <= overlapY && overlapX <= overlapZ)
+		{
+			//Resolve X collision
+			if (pX < tX)
+				self->position.x -= overlapX;
+			else
+				self->position.x += overlapX;
+		}
+		else if (overlapY <= overlapX && overlapY <= overlapZ)
+		{
+			//Resolve Y collision
+			if (pY < tY)
+				self->position.y -= overlapY;
+			else
+				self->position.y += overlapY;
+		}
+		else
+		{
+			/*
+			//Resolve Z collision
+			if (pZ < tZ)
+				self->position.z -= overlapZ;
+			else
+				self->position.z += overlapZ;
+			*/
+		}
+	}
+	else
+	{
+		//Not touching on the X
+	}
+}
+
+void moveRandom(Entity* self, Uint8 direction)
+{
+	if (!self)
+		return;
+
+	int num, temp, directionNew;
+	num = (rand() % 120) + 1;
+
+
+	if (num <= 10)
+	{
+		//1-10 
+		//10% chance to do a 180
+		directionNew = direction + 4;
+
+
+
+	}
+	else if (num <= 30)
+	{
+		//11-40
+		//30% chance to move back right or back left
+		temp = rand() % 2;
+		if (temp)
+		{
+			//Back Right
+			directionNew = direction + 3;
+
+		}
+		else
+		{
+			//Back Left
+			directionNew = direction - 3;
+		}
+
+	}
+	else if (num <= 60)
+	{
+		//Left or Right
+		temp = rand() % 2;
+		if (temp)
+		{
+			//Right
+			directionNew = direction + 2;
+
+		}
+		else
+		{
+			//Left
+			directionNew = direction - 2;
+		}
+
+	}
+	else if (num <= 100)
+	{
+		//Move front right or front left
+		temp = rand() % 2;
+		if (temp)
+		{
+			//Front Right
+			directionNew = direction + 1;
+
+		}
+		else
+		{
+			//Front Left
+			directionNew = direction + 1;
+		}
+	}
+	else
+	{
+		//Move Straight
+		directionNew = direction;
+	}
+
+	if (directionNew < 0)
+		directionNew += D_MAX;
+	else if (directionNew > D_MAX - 1)
+		directionNew -= D_MAX;
+
+
+
+	((EnemyData*)self->data)->currentDirection = directionNew;
+}
+
+/*
+	Adds the enemy's movement instructions to the move vector
+*/
+GFC_Vector3D move(Entity* self, Uint8 direction, GFC_Vector3D move)
+{
+	EnemyData* data;
+
+	if (!self)
+	{
+		return gfc_vector3d(0, 0, 0);
+	}
+
+
+	data = (EnemyData*)self->data;
+
+	if (!data)
+	{
+		return gfc_vector3d(0, 0, 0);
+	}
+
+
+	//slog("Monster is trying to move! Direction is %i",direction);
+
+	switch (direction)
+	{
+	case(D_NORTH):
+		
+		//slog("Moving North!");
+		move.x = 1;
+		data->enemyRotation.x = 0;
+		break;
+
+	case(D_NORTHEAST):
+		move.x = 1;
+		move.y = 1;
+		data->enemyRotation.x = GFC_PI/4;
+		//slog("Moving North East!");
+		break;
+
+	case(D_EAST):
+		move.y = 1;
+		data->enemyRotation.x = GFC_PI / 2;
+		//slog("Moving East!");
+		break;
+
+	case(D_SOUTHEAST):
+		move.x = -1;
+		move.y = 1;
+		data->enemyRotation.x = 3 * GFC_PI / 4;
+		//slog("Moving South East!");
+		break;
+
+	case(D_SOUTH):
+		move.x = -1;
+		//slog("Moving South");
+		break;
+
+	case(D_SOUTHWEST):
+		move.x = -1;
+		move.y = -1;
+		data->enemyRotation.x = 5*GFC_PI/4;
+		//slog("Moving South West!");
+		break;
+
+	case(D_WEST):
+		move.y = -1;
+		data->enemyRotation.x = 3 * GFC_PI / 2;
+		//slog("Moving West!");
+		break;
+
+	case(D_NORTHWEST):
+		move.x = 1;
+		move.y = -1;
+		data->enemyRotation.x = 7 * GFC_PI / 4;
+		//slog("Moving North West!");
+		break;
+
+	default:
+
+		slog("No real direction given for monster movement!");
+		return;
+
+
+	}
+	//slog("Move X: %f\nMove Y: %f ", move.x, move.y);
+	
+	return move;
+}
