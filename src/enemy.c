@@ -117,6 +117,12 @@ void enemyThink(Entity* self)
 	{
 		return;
 	}
+
+	if (self->hp <= 0)
+	{
+		self->role = ROLE_DEAD;
+	}
+
 	data->moveTimer++;
 
 	switch (self->role)
@@ -180,6 +186,10 @@ void enemyThink(Entity* self)
 
 			break;
 
+		case ROLE_DEAD:
+			self->_inUse = 0;
+			break;
+
 		default:
 
 			slog("Enemy has no role!");
@@ -196,7 +206,7 @@ void enemyUpdate(Entity* self)
 	GFC_Vector3D moveV = { 0 };
 	GFC_Vector3D offset;
 	
-	if (!self)
+	if (!self || !self->_inUse)
 	{
 		return;
 	}
@@ -369,7 +379,7 @@ void enemyTouch(Entity* self, Entity* toucher)
 
 		if (overlapX <= overlapY && overlapX <= overlapZ)
 		{
-			//Resolve X collision
+			//x collision
 			if (pX < tX)
 				self->position.x -= overlapX;
 			else
@@ -377,7 +387,7 @@ void enemyTouch(Entity* self, Entity* toucher)
 		}
 		else if (overlapY <= overlapX && overlapY <= overlapZ)
 		{
-			//Resolve Y collision
+			//y collision
 			if (pY < tY)
 				self->position.y -= overlapY;
 			else
@@ -386,12 +396,21 @@ void enemyTouch(Entity* self, Entity* toucher)
 		else
 		{
 			/*
-			//Resolve Z collision
+			//z collision
 			if (pZ < tZ)
 				self->position.z -= overlapZ;
 			else
 				self->position.z += overlapZ;
 			*/
+		}
+
+		if (toucher->team == TEAM_PLAYER)
+		{
+			self->hp--;
+			if (toucher->isProj)
+			{
+				toucher->_inUse = 0;
+			}
 		}
 	}
 	else

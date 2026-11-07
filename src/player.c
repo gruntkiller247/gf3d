@@ -382,6 +382,14 @@ void playerTouch(Entity* self, Entity* toucher)
 				self->position.z += overlapZ;
 			*/
 		}
+
+		if (toucher->team == TEAM_ENEMY)
+		{
+			if (toucher->isProj)
+			{
+				toucher->_inUse = 0;
+			}
+		}
 	}
 	else
 	{

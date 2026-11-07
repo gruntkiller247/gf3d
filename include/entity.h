@@ -43,10 +43,14 @@ typedef enum role_s
 {
 	ROLE_ERROR = -1,
 	ROLE_NONE,
+	ROLE_DEAD,
 
 	ROLE_PLAYER,
+
 	ROLE_WALL,
 	ROLE_FLOOR,
+
+	ROLE_DEFAULT_PROJ,
 
 	ROLE_TRASH,
 	ROLE_SUICIDER,
@@ -96,6 +100,8 @@ typedef struct Entity_S
 	Uint8 isInvul;
 	Uint8 damage;
 
+	Uint8 isProj;
+
 }Entity;
 
 static Entity* thePlayer = NULL;
@@ -117,6 +123,11 @@ Entity* entityNew();
 	@brief call to clean up an entity after it is no longer needed
 */
 void entityFree(Entity* self);
+
+/*
+	Checks for not in use entities and calls entityFree on them!
+*/
+void entityFreeAll();
 
 /*
 	@brief run updates on all active entities

@@ -1,5 +1,5 @@
-#ifndef __Enemy_H__
-#define __Enemy_H__
+#ifndef __ENEMY_H__
+#define __ENEMY_H__
 
 #include "entity.h"
 #include "model.h"

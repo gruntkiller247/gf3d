@@ -330,6 +330,21 @@ void entityFree(Entity* self)
 	memset(self, 0, sizeof(Entity));
 }
 
+void entityFreeAll()
+{
+	int c;
+	for (c = 0; c < entityManager.maxEnts; c++)
+	{
+
+		if (entityManager.entityList[c]._inUse || entityManager.entityList[c]._inUse == NULL)
+			continue;
+
+
+		entityFree(&entityManager.entityList[c]);
+
+	}
+}
+
 
 void entityClose()
 {

@@ -1,5 +1,5 @@
-#ifndef __Tile_H__
-#define __Tile_H__
+#ifndef __TILE_H__
+#define __TILE_H__
 
 #include "model.h"
 
