@@ -4,7 +4,7 @@
 #include "gf3d_mesh.h"
 #include "gf3d_obj_load.h"
 #include "wall.h"
-
+#include "tile.h"
 
 
 static Level* theLevel = NULL;
@@ -44,10 +44,12 @@ Level* levelNew()
 
 	//Hard Coded bounds for now
 	level->bounds = gfc_box(-50,-50,-50,100,100,100);
+	
+	level->backgroundMusic = NULL;
 
 	setLevel(level);
 
-	
+	//DO THING HERE!
 
 	return level;
 }
@@ -119,6 +121,8 @@ Level* levelLoad(const char* filename)
 		//gfc_sound(load_music);
 		//Mix_PlayMusic(the music thing)
 	}
+	
+
 
 
 	theLevel = level;
@@ -151,16 +155,17 @@ void levelFree(Level* level)
 
 	if (level->floorPlan)
 	{
+		slog("Floor plan needs to free tiles!");
 		free(level->floorPlan);
 	}
 
-	if (level->floor)
+	
+	if (level->backgroundMusic)
 	{
-		model_free(floor);
-	}
+		Mix_HaltMusic();
+		Mix_FreeMusic(level->backgroundMusic);
 
-	Mix_HaltMusic();
-	Mix_FreeMusic(level->backgroundMusic);
+	}
 
 	sj_free(level->json);
 
@@ -174,11 +179,11 @@ void levelDraw(Level* level)
 	int x, y;
 	int z = 0;
 	GFC_Matrix4 mat;
-	GFC_Vector3D* temp;
 	
-	Model* test;
+	
+	//Model* test;
 
-	test = model_load("models/floor/floor.json");
+	//test = model_load("models/Cube/Cube.json");
 
 	if (!level)
 	{
@@ -208,7 +213,7 @@ void levelDraw(Level* level)
 
 		//gfc_matrix4_make_translation(mat,*temp);
 
-		spawnWall(gfc_vector3d(x * 2, y * 2, z) , test);
+		//spawnWall(gfc_vector3d(x * 2, y * 2, z) , level->floor);
 		//gf3d_model_queue_render(level->floor, mat ,GFC_COLOR_WHITE);
 	}
 
@@ -289,7 +294,12 @@ Level* levelLoadTest()
 	GFC_List* floor;
 	GFC_List* row;
 	int c, d;
+	int x = 0, y = 0;
+	int z = -10;
 	int sizeMax, size, widthLevel, heightLevel;
+	
+
+	Entity* tempTile;
 	
 	level = levelNew();
 
@@ -313,13 +323,10 @@ Level* levelLoadTest()
 	level->sizeMax = sizeMax;
 	level->width = width;
 	level->height = height;
-	
-	level->floorPlan = gfc_allocate_array(sizeof(int),sizeMax);
 
-	level->floor = model_load("models/floor/floor.json");
-
-	//floor = gfc_allocate_array(sizeof(Uint16), sizeMax);
 	
+	
+	level->floorPlan = gfc_list_new_size(sizeMax);
 
 	if (!level->floorPlan)
 	{
@@ -327,7 +334,30 @@ Level* levelLoadTest()
 		goto fail;
 	}
 
+	for (c = 0; c < sizeMax; c++)
+	{
+		tempTile = tileEntityNew(TT_EMPTY, gfc_vector3d(x, y, z));
+
+		if (!tempTile)
+		{
+			slog("Failed tempTile");
+			goto fail;
+		}
+
+		x += tempTile->bounds.w;
+		//y = tempTile->bounds.y + tempTile->bounds.h;
+
+		slog("\nX pos: %i\nY pos: %i\nZ pos: %i", x, y, z);
+		//Create each entity based on the json map read/RNG. For now everything is just default tile
+		gfc_list_append(level->floorPlan, tempTile);
+
+		
+		
+	}
+
 	slog("Floorplan created.\nSize: %i\nWidth: %i\nHeight: %i",sizeMax,level->width,level->height);
+	
+	//Load the floorplan
 	
 
 	return level;

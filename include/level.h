@@ -37,9 +37,11 @@ typedef struct
 
 	//Floor plan will be a set of ints representing a floor tile/item/etc
 	GFC_List* floorPlan; //2D matrix representation of the level. In truth, a 1d Matrix
+		//Floorplan is a list of Tiles
+			//Each tile has the model to load and a state IE lava, normal, lab
 
-	Model* floor;
-	Model* wall;
+	//Model* floor;
+	//Model* wall;
 
 	//Kehoe aid
 	Uint8 *tileSet;

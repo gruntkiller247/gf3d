@@ -98,7 +98,7 @@ int main(int argc,char *argv[])
     //wall->rotation = gfc_vector3d(0,0,0);
 
     Model* dino = model_load("models/dino/dino.model");
-    Entity* wall2 = spawnWall(gfc_vector3d(5,5,0),dino);
+    //Entity* wall2 = spawnWall(gfc_vector3d(5,5,0),dino);
 
     //Entity* wall3 = spawnWall(gfc_vector3d(50, 50, 0), dino);
 
@@ -126,7 +126,7 @@ int main(int argc,char *argv[])
         entityUpdateAll();
         entityTouchAll();
         entityDrawAll();
-        levelDraw(level);
+        //levelDraw(level);
 
        
         //2D draws
