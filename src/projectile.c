@@ -121,6 +121,7 @@ void projectileUpdate(Entity* self)
 
 	if ((moveV.x) || (moveV.y))
 	{
+		//slog("\nPROJ MOVE:\nX: %f\nY: %f",moveV.x,moveV.y);
 		gfc_vector3d_normalize(&moveV);
 
 		//gfc_vector3d_rotate_about_z(&moveV, data->enemyRotation.x);
@@ -128,6 +129,7 @@ void projectileUpdate(Entity* self)
 		self->velocity = moveV;
 	}
 
+	
 
 	gfc_vector3d_add(self->position, self->position, self->velocity);
 	offset = gfc_vector3d(0, 0, 100);
@@ -174,7 +176,7 @@ void projectileTouch(Entity* self, Entity* toucher)
 
 
 /*
-	Recieves itself and a PI direction
+	Recieves itself and a to move towards direction
 */
 void projectileGiveMove(Entity* self, GFC_Vector3D direction)
 {

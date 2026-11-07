@@ -1,5 +1,6 @@
 #include "simple_logger.h"
 #include "enemy.h"
+#include "projectile.h"
 
 typedef struct Enemy_S
 {
@@ -88,6 +89,19 @@ Entity* enemyEntityNew(GFC_Vector3D pos, int role)
 
 			data->moveMax = 10;
 			data->lookAt = getPlayer()->position;
+
+			break;
+
+		case ROLE_STATION:
+			self->model = model_load("models/Cube/Cube.json");//model_load("models/dino/dino.model");
+			self->color = GFC_COLOR_YELLOW;
+			self->maxHp = 1;
+			self->hp = self->maxHp;
+			self->damage = 1;
+
+			data->moveMax = 10;
+			data->lookAt = getPlayer()->position;
+
 
 			break;
 		
@@ -188,6 +202,11 @@ void enemyThink(Entity* self)
 
 			break;
 
+		case ROLE_STATION:
+			data->lookAt = getPlayer()->position;
+			//slog("\nWhere I think the player is!\nX: %f\nY: %f", data->lookAt.x, data->lookAt.y);
+			break;
+
 		case ROLE_DEAD:
 			self->_inUse = 0;
 			break;
@@ -207,6 +226,8 @@ void enemyUpdate(Entity* self)
 	EnemyData* data;
 	GFC_Vector3D moveV = { 0 };
 	GFC_Vector3D offset;
+	GFC_Vector3D temp = { 0 };
+	Entity* proj;
 	
 	if (!self || !self->_inUse)
 	{
@@ -253,6 +274,28 @@ void enemyUpdate(Entity* self)
 
 
 			}
+
+			break;
+
+		case ROLE_STATION:
+			//Spawn a projectile and have it move in a direction towards the player!
+
+			if (data->moveTimer >= data->moveMax)
+			{
+				data->moveTimer = 0;
+				proj = projectileEntityNew(self->position, self->team, TTL_PROJ_DEFAULT, ROLE_DEFAULT_PROJ);
+				
+				if (proj)
+				{
+					gfc_vector3d_sub(temp,getPlayer()->position,self->position);
+
+
+					//slog("\nWhere I think the player is!\nX: %f\nY: %f", temp.x, temp.y);
+					projectileGiveMove(proj,temp);
+				}
+			}
+
+
 
 			break;
 		default:

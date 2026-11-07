@@ -105,9 +105,9 @@ int main(int argc,char *argv[])
 
     level = levelLoadTest();
 
-    Entity* enemy = enemyEntityNew(gfc_vector3d(20, 20, 0), ROLE_SUICIDER);
+    //Entity* enemy = enemyEntityNew(gfc_vector3d(20, 20, 0), ROLE_SUICIDER);
     //Entity* enemy2 = enemyEntityNew(gfc_vector3d(20, 20, 0), ROLE_TRASH);
-    
+    Entity* enemy3 = enemyEntityNew(gfc_vector3d(20, 20, 0), ROLE_STATION);
 
     // main game loop    
     while(!_done)

@@ -359,6 +359,7 @@ void playerTouch(Entity* self, Entity* toucher)
 			//slog("Player touched by enemy!");
 			if (toucher->isProj)
 			{
+				//slog("BEING TOUCHED BY ENEMY PROJ!");
 				toucher->_inUse = 0;
 				
 			}
