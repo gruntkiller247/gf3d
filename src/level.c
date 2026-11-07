@@ -43,7 +43,7 @@ Level* levelNew()
 	//gfc_matrix4_identity(level->terrainMatrix);
 
 	//Hard Coded bounds for now
-	level->bounds = gfc_box(-50,-50,-50,100,100,100);
+	level->bounds = gfc_box(-10,-10,-10,1000,1000,1000);
 	
 	level->backgroundMusic = NULL;
 
@@ -316,7 +316,7 @@ Level* levelLoadTest()
 	//int x = index % width;
 	//int y = index / width;
 	
-	int width = 10, height = 10;
+	int width = 20, height = 20;
 	
 	sizeMax = width * height;
 
@@ -347,8 +347,8 @@ Level* levelLoadTest()
 
 		x += tempTile->bounds.w;
 
-		//Made an L shape
-		if (c != 0 && c % width == 0)
+		
+		if (c != 0 && (c+1) % width == 0)
 		{
 			x = 0;
 			y += tempTile->bounds.h;

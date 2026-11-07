@@ -75,7 +75,7 @@ int main(int argc,char *argv[])
     gf2d_font_init("config/font.cfg");
     gf2d_actor_init(1000);
 
-    entityInit(10000);
+    entityInit(1000);
     player = playerEntityNew(gfc_vector3d(0, 0, 0));
     
     //game init

@@ -7,7 +7,9 @@ typedef enum
 {
 	TT_ERROR = -1,
 	TT_EMPTY = 0,
-	TT_SABER = 1
+	TT_SABER,
+	TT_WALL,
+
 }TileTypes;
 
 
