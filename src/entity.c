@@ -72,6 +72,8 @@ Entity* entityNew()
 		//entityManager.entityList[c].model = "models/dino/dino.json"; //"models/floor/floor.json";
 		//entityManager.entityList[c].directionLooking = 0;
 
+		//slog("ID: %i", id);
+
 		return &entityManager.entityList[c];
 	}
 

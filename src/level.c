@@ -324,7 +324,8 @@ Level* levelLoadTest()
 	level->width = width;
 	level->height = height;
 
-	
+	level->minRoomSize = 5;
+	level->maxRoomSize = 5;
 	
 	level->floorPlan = gfc_list_new_size(sizeMax);
 
@@ -345,12 +346,20 @@ Level* levelLoadTest()
 		}
 
 		x += tempTile->bounds.w;
+
+		//Made an L shape
+		if (c != 0 && c % width == 0)
+		{
+			x = 0;
+			y += tempTile->bounds.h;
+		}
+
 		//y = tempTile->bounds.y + tempTile->bounds.h;
 
 		slog("\nX pos: %i\nY pos: %i\nZ pos: %i", x, y, z);
 		//Create each entity based on the json map read/RNG. For now everything is just default tile
 		gfc_list_append(level->floorPlan, tempTile);
-
+		//slog("X: %i", x);
 		
 		
 	}
@@ -377,6 +386,7 @@ fail:
 
 }
 
+//Also pushes back TILES! DO NOT FORGET AGAIN!
 void levelPosCheck(Level* level, Entity* self)
 {
 	if (!level)
