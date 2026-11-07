@@ -14,6 +14,8 @@ void enemyFree(Entity* self);
 
 void enemyTouch(Entity* self, Entity* toucher);
 
+void enemyTakeDamage(Entity* self, Entity* toucher);
+
 void enemyMove(Entity* self);
 
 void enemyDraw(Entity* self);

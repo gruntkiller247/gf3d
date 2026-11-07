@@ -80,7 +80,7 @@ Entity* enemyEntityNew(GFC_Vector3D pos, int role)
 			break;
 
 		case ROLE_SUICIDER:
-			self->model = model_load("models/dino/dino.model");
+			self->model = model_load("models/Cube/Cube.json");//model_load("models/dino/dino.model");
 			self->color = GFC_COLOR_ORANGE;
 			self->maxHp = 1;
 			self->hp = self->maxHp;
@@ -315,8 +315,10 @@ void enemyTouch(Entity* self, Entity* toucher)
 {
 	if (!self || !toucher)
 	{
+		//slog("AGKNAJSGNASF");
 		return;
 	}
+
 	//Player's box
 	//Min num
 	float pX, pY, pZ;
@@ -328,12 +330,6 @@ void enemyTouch(Entity* self, Entity* toucher)
 	float tX, tY, tZ;
 	float tW, tH, tD;
 	//Max num are the aboves combined
-
-	if (!self || !toucher)
-	{
-		slog("Player is trying to touch/be touched by an error!");
-		return;
-	}
 
 	pX = self->bounds.x + self->position.x;
 	pY = self->bounds.y + self->position.y;
@@ -349,9 +345,25 @@ void enemyTouch(Entity* self, Entity* toucher)
 	tH = toucher->bounds.h;
 	tD = toucher->bounds.d;
 
+	
 	//Check if we are touching
 	if (pX <= tX + tW && pX + pW >= tX && pY <= tY + tH && pY + pH >= tY && pZ <= tZ + tD && pZ + pD >= tZ)
 	{
+		if (toucher->team == TEAM_PLAYER)
+		{
+			slog("ENEMY TOUCHED by player!");
+
+			self->hp--;
+			if (toucher->isProj)
+			{
+				slog("ENEMY TOUCHED PLAYER PROJ!");
+				toucher->_inUse = 0;
+				
+			}
+			return;
+		}
+
+
 		//Calculate overlap on each axis
 		float overlapX = (pX + pW) - tX;
 		float overlapY = (pY + pH) - tY;
@@ -404,14 +416,7 @@ void enemyTouch(Entity* self, Entity* toucher)
 			*/
 		}
 
-		if (toucher->team == TEAM_PLAYER)
-		{
-			self->hp--;
-			if (toucher->isProj)
-			{
-				toucher->_inUse = 0;
-			}
-		}
+
 	}
 	else
 	{

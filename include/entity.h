@@ -89,7 +89,6 @@ typedef struct Entity_S
 	void		(*touch)(struct Entity_S* self, struct Entity_S* toucher);
 	void* data;								//Used for custom data. Must create a free function for it!
 
-	
 
 	GFC_TextLine	name;
 	Uint8 directionLooking;
@@ -101,6 +100,9 @@ typedef struct Entity_S
 	Uint8 damage;
 
 	Uint8 isProj;
+
+	
+	
 
 }Entity;
 

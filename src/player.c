@@ -296,7 +296,7 @@ void playerUpdate(Entity* self)
 
 	if (gfc_input_key_pressed("g"))
 	{
-		slog("Shooting test proj!");
+		//slog("Shooting test proj!");
 		proj = projectileEntityNew(self->position, self->team, TTL_PROJ_DEFAULT, ROLE_DEFAULT_PROJ);
 
 		if (proj)
@@ -353,6 +353,19 @@ void playerTouch(Entity* self, Entity* toucher)
 	//Check if we are touching
 	if (pX <= tX + tW && pX + pW >= tX && pY <= tY + tH && pY + pH >= tY && pZ <= tZ + tD && pZ + pD >= tZ)
 	{
+		
+		if (toucher->team == TEAM_ENEMY)
+		{
+			slog("Player touched by enemy!");
+			if (toucher->isProj)
+			{
+				toucher->_inUse = 0;
+				
+			}
+			return;
+		}
+
+		//slog("TOUCHING");
 		//Calculate overlap on each axis
 		float overlapX = (pX + pW) - tX;
 		float overlapY = (pY + pH) - tY;
@@ -405,13 +418,6 @@ void playerTouch(Entity* self, Entity* toucher)
 			*/
 		}
 
-		if (toucher->team == TEAM_ENEMY)
-		{
-			if (toucher->isProj)
-			{
-				toucher->_inUse = 0;
-			}
-		}
 	}
 	else
 	{

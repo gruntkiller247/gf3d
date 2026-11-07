@@ -215,6 +215,7 @@ void entityTouch(Entity* self, Entity* toucher)
 		return;
 	}
 
+	//slog("\nself: %i\ntoucher: %i",self->role,toucher->role);
 	
 	if (self->touch)
 	{
@@ -225,7 +226,7 @@ void entityTouch(Entity* self, Entity* toucher)
 		//slog("Entity has no touch!");
 	}
 
-	/*
+	
 	if (toucher->touch)
 	{
 		toucher->touch(toucher, self);
@@ -234,7 +235,7 @@ void entityTouch(Entity* self, Entity* toucher)
 	{
 		//slog("Entity has no touch!");
 	}
-	*/
+	
 
 }
 
@@ -247,22 +248,34 @@ void entityTouchAll()
 			continue;
 
 		if (entityManager.entityList[c].team == TEAM_IGNORE)
+		{
+			//slog("IGNORED! - C %i", entityManager.entityList[0].team);
 			continue;
+		}
 
-
+		
 		for (d = c + 1; d < entityManager.maxEnts; d++)
 		{
 			if (!entityManager.entityList[d]._inUse)
 				continue;
 
-			if (entityManager.entityList[d].team == TEAM_IGNORE)
-				continue;
 
+			if (entityManager.entityList[d].team == TEAM_IGNORE)
+			{
+				//slog("IGNORED! - D %i", entityManager.entityList[d].team);
+				continue;
+			}
+			
+			
 			if (entityManager.entityList[d].team == entityManager.entityList[c].team)
 				continue;
+			
+
+			
 
 			entityTouch(&entityManager.entityList[c], &entityManager.entityList[d]);
 		}
+		
 		
 	}
 }
