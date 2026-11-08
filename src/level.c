@@ -338,7 +338,7 @@ Level* levelLoadTest()
 	for (c = 0; c < sizeMax; c++)
 	{
 		rdNum = rand() % (10 - 1 + 1) + 1;
-		//rdNum = 0;
+		rdNum = 3;
 
 		if (rdNum == 1)
 		{
@@ -349,6 +349,10 @@ Level* levelLoadTest()
 		else if (rdNum == 2)
 		{
 			tempTile = tileEntityNew(TT_ENEMY_SPAWNER, gfc_vector3d(x, y, z));
+		}
+		else if (rdNum == 3)
+		{
+			tempTile = tileEntityNew(TT_GRAVITY, gfc_vector3d(x, y, z));
 		}
 		else
 		{

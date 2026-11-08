@@ -74,6 +74,8 @@ Entity* entityNew()
 		entityManager.entityList[c].maxFreeze = SE_FREEZE_TIME;
 		entityManager.entityList[c].damage = 1;
 		entityManager.entityList[c].ignoreGravity = 0;
+		entityManager.entityList[c].reverseGravity = 0;
+		entityManager.entityList[c].reverseGravityMax = SE_GRAVITY_TIME;
 
 		//entityManager.entityList[c].model = "models/dino/dino.json"; //"models/floor/floor.json";
 		//entityManager.entityList[c].directionLooking = 0;
@@ -108,7 +110,24 @@ void entityUpdate(Entity* self)
 
 	if (!self->ignoreGravity)
 	{
-		self->position.z -= 0.3f;
+		if (!self->reverseGravity)
+		{
+			
+			self->position.z -= 0.3f;
+		}
+		else
+		{
+			//slog("Revrse gravity!");
+			self->reverseGravityTimer++;
+			self->position.z += 0.3f;
+		}
+
+		if (self->reverseGravityTimer >= self->reverseGravityMax)
+		{
+			self->reverseGravity = 0;
+			self->reverseGravityTimer = 0;
+		}
+		
 	}
 
 	if (self->isFrozen)

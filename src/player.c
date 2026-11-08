@@ -419,32 +419,29 @@ void playerTouch(Entity* self, Entity* toucher)
 			//slog("Player touched by enemy!");
 			if (toucher->isProj)
 			{
-				if (projectileCanFreeze(toucher))
-				{
-					self->isFrozen = 1;
-				}
-				//slog("BEING TOUCHED BY ENEMY PROJ!");
-				toucher->_inUse = 0;
-				
-			}
-			/*
-			else if (toucher->role == ROLE_FLOOR_TRAP)
-			{
-				statusEffect = tileCanStatus(toucher);
-
-				switch(statusEffect)
+				statusEffect = projectileCanStatus(toucher);
+				switch (statusEffect)
 				{
 					case SE_FREEZE:
 						self->isFrozen = 1;
 
 						break;
 
+					case SE_GRAVITY:
+
+						self->reverseGravity = 1;
+
 					default:
+
 						break;
 				}
+
+				toucher->_inUse = 0;
+				return;
+				
 			}
-			*/
-			return;
+
+			
 		}
 
 		//slog("TOUCHING");

@@ -569,6 +569,8 @@ void enemyFree(Entity* self)
 
 void enemyTouch(Entity* self, Entity* toucher)
 {
+	Uint8 statusEffect;
+
 	if (!self || !toucher)
 	{
 		//slog("AGKNAJSGNASF");
@@ -614,11 +616,22 @@ void enemyTouch(Entity* self, Entity* toucher)
 
 			if (toucher->isProj)
 			{
-				if (projectileCanFreeze(toucher))
+				statusEffect = projectileCanStatus(toucher);
+				switch (statusEffect)
 				{
-					self->isFrozen = 1;
+					case SE_FREEZE:
+						self->isFrozen = 1;
+
+						break;
+
+					case SE_GRAVITY:
+
+						self->reverseGravity = 1;
+
+					default:
+
+						break;
 				}
-				//slog("ENEMY TOUCHED PLAYER PROJ!");
 				toucher->_inUse = 0;
 				
 			}

@@ -15,13 +15,14 @@ typedef struct
 	GFC_Vector3D currentDirection;
 
 	Uint8 canFreeze;
+	Uint8 canGravity;
 }ProjData;
 
 void projectileThink(Entity* self);
 void projectileUpdate(Entity* self);
 void projectileFree(Entity* self);
 void projectileTouch(Entity* self, Entity* toucher);
-Uint8 projectileCanFreeze(Entity* self);
+Uint8 projectileCanStatus(Entity* self);
 
 
 Entity* projectileEntityNew(GFC_Vector3D position, Uint8 team, Uint16 timeToLive, Uint16 role)
@@ -37,15 +38,15 @@ Entity* projectileEntityNew(GFC_Vector3D position, Uint8 team, Uint16 timeToLive
 	}
 	self->data = malloc(sizeof(ProjData));
 	data = (ProjData*)self->data;
-
 	
-
-
 	if (!data)
 	{
 		slog("Failed to make proj data!");
 		return NULL;
 	}
+
+	data->canGravity = 0;
+	data->canFreeze = 0;
 
 	switch (role)
 	{
@@ -53,6 +54,13 @@ Entity* projectileEntityNew(GFC_Vector3D position, Uint8 team, Uint16 timeToLive
 			data->canFreeze = 1;
 			self->damage = 0;
 			self->color = GFC_COLOR_LIGHTBLUE;
+			break;
+
+		case ROLE_GRAVITY_PROJ:
+			data->canGravity = 1;
+			self->damage = 0;
+			self->color = GFC_COLOR_MAGENTA;
+
 			break;
 
 		default:
@@ -238,21 +246,31 @@ void projectileGiveMove(Entity* self, GFC_Vector3D direction)
 	data->currentDirection = direction;
 }
 
-Uint8 projectileCanFreeze(Entity* self)
+Uint8 projectileCanStatus(Entity* self)
 {
 	ProjData* data;
 
 	if (!self)
 	{
-		return 0;
+		return SE_NONE;
 	}
 
 	data = (ProjData*)self->data;
 
 	if (!data)
 	{
-		return 0;
+		return SE_NONE;
 	}
 
-	return data->canFreeze == 1;
+	if (data->canFreeze)
+	{
+		return SE_FREEZE;
+	}
+
+	if (data->canGravity)
+	{
+		return SE_GRAVITY;
+	}
+
+	return SE_NONE;
 }

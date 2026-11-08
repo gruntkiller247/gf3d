@@ -12,6 +12,8 @@ typedef enum
 	TT_WALL,
 	TT_FREEZE,
 	TT_ENEMY_SPAWNER,
+	TT_GRAVITY,
+
 
 
 }TileTypes;

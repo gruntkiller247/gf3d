@@ -8,6 +8,7 @@ typedef struct
 {
 	Uint8 canFreeze;
 	Uint8 canSpawn;
+	Uint8 canGravity;
 
 	Uint16 shotTimer;
 	Uint16 shotMax;
@@ -50,6 +51,7 @@ Entity* tileEntityNew(Uint8 role, GFC_Vector3D pos)
 	data->shotTimer = 0;
 	data->canSpawn = 0;
 	data->spawned = 0;
+	data->canGravity = 0;
 	
 
 	gfc_vector3d_copy(tile->position,pos);
@@ -96,6 +98,20 @@ Entity* tileEntityNew(Uint8 role, GFC_Vector3D pos)
 			data->shotMax = rdNum;
 			//slog("RDNUM: %i", rdNum);
 			tile->team = TEAM_TRAP;
+			break;
+
+		case TT_GRAVITY:
+			tile->model = model_load("models/floor/floor.json");
+			tile->color = GFC_COLOR_LIGHTRED;
+			rdNum = (rand() % (2000 - 1000 + 1)) + 1000;
+
+			data->canGravity = 1;
+
+			data->shotMax = rdNum;
+			//slog("RDNUM: %i", rdNum);
+			tile->team = TEAM_TRAP;
+
+
 			break;
 
 		default:
@@ -185,6 +201,23 @@ void tileUpdate(Entity* self)
 				}
 				break;
 
+			case SE_GRAVITY:
+				data->shotTimer++;
+
+				if (data->shotTimer >= data->shotMax)
+				{
+					//slog("SHOOTING ICE SPIKE!\nShotMax: %i",data->shotMax);
+					data->shotTimer = 0;
+
+					temp.x = self->position.x;
+					temp.y = self->position.y;
+					temp.z = self->position.z + self->model->mesh->bounds.w;
+
+					proj = projectileEntityNew(self->position, self->team, TTL_PROJ_MELEE, ROLE_GRAVITY_PROJ);
+				}
+
+				break;
+
 			default:
 				slog("NO TILE STATUS!");
 		}
@@ -230,6 +263,11 @@ Uint8 tileCanStatus(Entity* tile)
 	if (data->canSpawn == 1)
 	{
 		return SE_SPAWN;
+	}
+
+	if (data->canGravity == 1)
+	{
+		return SE_GRAVITY;
 	}
 
 	return SE_NONE;

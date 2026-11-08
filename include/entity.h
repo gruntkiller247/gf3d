@@ -67,6 +67,8 @@ typedef enum role_s
 	ROLE_DEFAULT_BOMB,
 	ROLE_LAVA_BOMB,
 	ROLE_FREEZE_PROJ,
+	ROLE_GRAVITY_PROJ,
+
 
 	ROLE_TRASH,
 	ROLE_SUICIDER,
@@ -80,6 +82,7 @@ typedef enum role_s
 typedef enum status_time_s
 {
 	SE_FREEZE_TIME = 300,
+	SE_GRAVITY_TIME = 200,
 
 }StatusEffectTimers;
 
@@ -88,6 +91,7 @@ typedef enum status_s
 	SE_NONE = 0,
 	SE_FREEZE = 1,
 	SE_SPAWN,
+	SE_GRAVITY,
 
 
 }StatusEffects;
@@ -140,6 +144,10 @@ typedef struct Entity_S
 	Uint8 maxFreeze;
 
 	Uint8 ignoreGravity;
+
+	Uint8 reverseGravity;
+	Uint8 reverseGravityMax;
+	Uint8 reverseGravityTimer;
 	
 
 }Entity;
