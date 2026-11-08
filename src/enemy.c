@@ -659,13 +659,13 @@ void enemyTouch(Entity* self, Entity* toucher)
 		}
 		else
 		{
-			/*
+			
 			//z collision
 			if (pZ < tZ)
 				self->position.z -= overlapZ;
 			else
 				self->position.z += overlapZ;
-			*/
+			
 		}
 
 

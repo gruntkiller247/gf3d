@@ -60,6 +60,7 @@ typedef enum role_s
 
 	ROLE_WALL,
 	ROLE_FLOOR,
+	ROLE_FLOOR_TRAP,
 
 	ROLE_DEFAULT_PROJ,
 	ROLE_DEFAULT_BOMB,
@@ -75,11 +76,18 @@ typedef enum role_s
 
 }Role;
 
-typedef enum status_s
+typedef enum status_time_s
 {
 	SE_FREEZE_TIME = 300,
 
-}StatusEffect;
+}StatusEffectTimers;
+
+typedef enum status_s
+{
+	SE_NONE = 0,
+	SE_FREEZE = 1,
+
+}StatusEffects;
 
 
 typedef struct Entity_S

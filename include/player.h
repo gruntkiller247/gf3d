@@ -11,6 +11,12 @@ typedef struct Player_S
 
 }PlayerData;
 
+typedef enum
+{
+	PLAYER_JUMP_HEIGHT = 10,
+
+}PlayerStats;
+
 Entity* playerEntityNew(GFC_Vector3D position);
 
 void playerThink(Entity* self);

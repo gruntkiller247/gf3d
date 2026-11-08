@@ -12,6 +12,7 @@
 #include "camera.h"
 #include "projectile.h"
 #include "bomb.h"
+#include "tile.h"
 
 static Level* theLevel = NULL;
 //Setup gets + setters!
@@ -234,6 +235,28 @@ void playerThink(Entity* self)
 	{
 		move.x = 1;
 	}
+
+	if (gfc_input_key_pressed("SPACE"))
+	{
+		move.z = 1;
+	}
+	else
+	{
+		move.z = 0;
+	}
+
+	if (move.z)
+	{
+		if (move.z > 0)
+		{
+			//Check is grounded here - TODO
+			self->position.z+= PLAYER_JUMP_HEIGHT;
+		}
+		else
+		{
+			//self->position.z--;
+		}
+	}
 	
 
 	GFC_Vector3D offset = gfc_vector3d(0, 0, 100);
@@ -354,6 +377,7 @@ void playerDraw(Entity* self)
 
 void playerTouch(Entity* self, Entity* toucher)
 {
+	Uint8 statusEffect;
 	//Player's box
 	//Min num
 	float pX, pY, pZ;
@@ -403,6 +427,21 @@ void playerTouch(Entity* self, Entity* toucher)
 				toucher->_inUse = 0;
 				
 			}
+			else if (toucher->role == ROLE_FLOOR_TRAP)
+			{
+				statusEffect = tileCanStatus(toucher);
+
+				switch(statusEffect)
+				{
+					case SE_FREEZE:
+						self->isFrozen = 1;
+
+						break;
+
+					default:
+						break;
+				}
+			}
 			return;
 		}
 
@@ -450,13 +489,13 @@ void playerTouch(Entity* self, Entity* toucher)
 		}
 		else
 		{
-			/*
+			
 			//Resolve Z collision
 			if (pZ < tZ)
 				self->position.z -= overlapZ;
 			else
 				self->position.z += overlapZ;
-			*/
+			
 		}
 
 	}

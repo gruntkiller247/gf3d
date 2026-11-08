@@ -105,6 +105,8 @@ void entityUpdate(Entity* self)
 		return;
 	}
 
+	self->position.z -= 0.3f;
+
 	if (self->isFrozen)
 	{
 		//slog("I AM FUCKING COLD!\n%i\n%i",self->frozenTimer,self->maxFreeze);
