@@ -47,7 +47,8 @@ typedef enum
 	TEAM_PLAYER,
 	TEAM_ENEMY,
 	TEAM_IGNORE,
-	TEAM_ITEM
+	TEAM_ITEM,
+	TEAM_TRAP
 }Teams;
 
 typedef enum role_s

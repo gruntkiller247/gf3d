@@ -38,6 +38,9 @@ Entity* projectileEntityNew(GFC_Vector3D position, Uint8 team, Uint16 timeToLive
 	self->data = malloc(sizeof(ProjData));
 	data = (ProjData*)self->data;
 
+	
+
+
 	if (!data)
 	{
 		slog("Failed to make proj data!");
@@ -119,6 +122,12 @@ void projectileUpdate(Entity* self)
 	data = (ProjData*)self->data;
 
 	if (!data)
+	{
+		return;
+	}
+
+
+	if (self->team == TEAM_TRAP)
 	{
 		return;
 	}

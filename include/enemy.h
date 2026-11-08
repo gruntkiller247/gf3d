@@ -4,6 +4,12 @@
 #include "entity.h"
 #include "model.h"
 
+typedef enum
+{
+	MONSTER_JUMP_HEIGHT = 5,
+
+}MonsterStats;
+
 Entity* enemyEntityNew(GFC_Vector3D pos, Uint8 role);
 
 void enemyThink(Entity* self);

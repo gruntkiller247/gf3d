@@ -1,24 +1,26 @@
 #include "simple_logger.h"
 #include "entity.h"
 #include "tile.h"
-
+#include "projectile.h"
 
 
 typedef struct
 {
 	Uint8 canFreeze;
-	Uint8 shotTimer;
-	Uint8 shotMax;
+	Uint16 shotTimer;
+	Uint16 shotMax;
 }TileData;
 
 
 void tileDraw(Entity* tile);
+void tileUpdate(Entity* self);
 
 
 Entity* tileEntityNew(Uint8 role, GFC_Vector3D pos)
 {
 	Entity* tile;
 	TileData* data;
+	int rdNum;
 
 	tile = entityNew();
 
@@ -38,6 +40,11 @@ Entity* tileEntityNew(Uint8 role, GFC_Vector3D pos)
 	}
 	
 	//tile->draw = tileDraw;
+	//Initalize all data stuff here! Or else the freeze bug comes back!
+	data->canFreeze = 0;
+	data->shotMax = -1;
+	data->shotTimer = 0;
+	
 
 	gfc_vector3d_copy(tile->position,pos);
 	
@@ -65,6 +72,12 @@ Entity* tileEntityNew(Uint8 role, GFC_Vector3D pos)
 			tile->model = model_load("models/floor/floor.json");
 			tile->color = GFC_COLOR_LIGHTBLUE;
 			data->canFreeze = 1;
+
+			rdNum = (rand() % (2000 - 1000 + 1)) + 1000;
+
+			data->shotMax = rdNum;
+			//slog("RDNUM: %i", rdNum);
+			tile->team = TEAM_TRAP;
 			break;
 
 		default:
@@ -75,6 +88,7 @@ Entity* tileEntityNew(Uint8 role, GFC_Vector3D pos)
 
 	tile->role = role;
 	tile->free = tileFree;
+	tile->update = tileUpdate;
 
 	if (tile->model)
 	{
@@ -91,6 +105,37 @@ void tileDraw(Entity* tile)
 	{
 		return;
 	}
+}
+
+void tileUpdate(Entity* self)
+{
+	TileData* data;
+	Entity* proj;
+
+	if (!self)
+	{
+		return;
+	}
+
+	data = (TileData*)self->data;
+
+	if (!data)
+	{
+		return;
+	}
+
+	if (tileCanStatus(self) != 0)
+	{
+		data->shotTimer++;
+		//Do tile 'shot' above
+		if (data->shotTimer >= data->shotMax)
+		{
+			//slog("SHOOTING ICE SPIKE!\nShotMax: %i",data->shotMax);
+			data->shotTimer = 0;
+			proj = projectileEntityNew(self->position, self->team, TTL_PROJ_MELEE, ROLE_FREEZE_PROJ);
+		}
+	}
+
 }
 
 void tileFree(Entity* tile)
@@ -122,7 +167,7 @@ Uint8 tileCanStatus(Entity* tile)
 		return SE_NONE;
 	}
 
-	if (data->canFreeze)
+	if (data->canFreeze == 1)
 	{
 		return SE_FREEZE;
 	}

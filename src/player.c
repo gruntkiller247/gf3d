@@ -414,7 +414,7 @@ void playerTouch(Entity* self, Entity* toucher)
 	if (pX <= tX + tW && pX + pW >= tX && pY <= tY + tH && pY + pH >= tY && pZ <= tZ + tD && pZ + pD >= tZ)
 	{
 		
-		if (toucher->team == TEAM_ENEMY)
+		if (toucher->team == TEAM_ENEMY || toucher->team == TEAM_TRAP)
 		{
 			//slog("Player touched by enemy!");
 			if (toucher->isProj)
@@ -427,6 +427,7 @@ void playerTouch(Entity* self, Entity* toucher)
 				toucher->_inUse = 0;
 				
 			}
+			/*
 			else if (toucher->role == ROLE_FLOOR_TRAP)
 			{
 				statusEffect = tileCanStatus(toucher);
@@ -442,6 +443,7 @@ void playerTouch(Entity* self, Entity* toucher)
 						break;
 				}
 			}
+			*/
 			return;
 		}
 

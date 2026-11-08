@@ -346,6 +346,7 @@ void enemyUpdate(Entity* self)
 	GFC_Vector3D offset;
 	GFC_Vector3D temp = { 0 };
 	Entity* proj;
+	int rdNum;
 	
 	if (!self || !self->_inUse)
 	{
@@ -508,11 +509,20 @@ void enemyUpdate(Entity* self)
 	{
 		if (moveV.z > 0)
 		{
-			self->position.z++;
+			rdNum = rand() % (10 - 1 + 1) + 1;
+			if (rdNum > 5)
+			{
+				self->position.z += MONSTER_JUMP_HEIGHT;
+			}
+			else
+			{
+				self->position.z += MONSTER_JUMP_HEIGHT/2;
+			}
+			
 		}
 		else
 		{
-			self->position.z--;
+			//self->position.z--;
 		}
 	}
 
