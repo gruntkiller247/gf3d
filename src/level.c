@@ -338,11 +338,17 @@ Level* levelLoadTest()
 	for (c = 0; c < sizeMax; c++)
 	{
 		rdNum = rand() % (10 - 1 + 1) + 1;
+		//rdNum = 0;
 
 		if (rdNum == 1)
 		{
 			//slog("FREEZING!");
-			tempTile = tileEntityNew(TT_FREEZE, gfc_vector3d(x, y, z));
+			//tempTile = tileEntityNew(TT_FREEZE, gfc_vector3d(x, y, z));
+			tempTile = tileEntityNew(TT_FLOOR, gfc_vector3d(x, y, z));
+		}
+		else if (rdNum == 2)
+		{
+			tempTile = tileEntityNew(TT_ENEMY_SPAWNER, gfc_vector3d(x, y, z));
 		}
 		else
 		{

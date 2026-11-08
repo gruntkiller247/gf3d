@@ -52,9 +52,22 @@ Entity* projectileEntityNew(GFC_Vector3D position, Uint8 team, Uint16 timeToLive
 		case ROLE_FREEZE_PROJ:
 			data->canFreeze = 1;
 			self->damage = 0;
+			self->color = GFC_COLOR_LIGHTBLUE;
 			break;
 
 		default:
+			break;
+	}
+
+	switch (timeToLive)
+	{
+		case TTL_PROJ_MELEE:
+			self->ignoreGravity = 1;
+		
+			break;
+
+		default:
+
 			break;
 	}
 

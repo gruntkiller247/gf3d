@@ -87,6 +87,8 @@ typedef enum status_s
 {
 	SE_NONE = 0,
 	SE_FREEZE = 1,
+	SE_SPAWN,
+
 
 }StatusEffects;
 
@@ -136,6 +138,8 @@ typedef struct Entity_S
 	Uint8 isFrozen;
 	Uint8 frozenTimer;
 	Uint8 maxFreeze;
+
+	Uint8 ignoreGravity;
 	
 
 }Entity;

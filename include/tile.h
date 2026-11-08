@@ -11,6 +11,8 @@ typedef enum
 	TT_SABER,
 	TT_WALL,
 	TT_FREEZE,
+	TT_ENEMY_SPAWNER,
+
 
 }TileTypes;
 

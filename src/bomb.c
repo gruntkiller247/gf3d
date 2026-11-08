@@ -49,6 +49,18 @@ Entity* bombEntityNew(GFC_Vector3D position, Uint8 team, Uint16 timeToLive, Uint
 			data->numExplosions = 1;
 	}
 
+	switch (timeToLive)
+	{
+		case TTL_BOMB_MELEE:
+			self->ignoreGravity = 1;
+
+			break;
+
+		default:
+
+			break;
+	}
+
 	self->position = position;
 	self->team = team;
 	self->role = role;

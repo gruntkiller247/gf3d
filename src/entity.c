@@ -73,6 +73,7 @@ Entity* entityNew()
 
 		entityManager.entityList[c].maxFreeze = SE_FREEZE_TIME;
 		entityManager.entityList[c].damage = 1;
+		entityManager.entityList[c].ignoreGravity = 0;
 
 		//entityManager.entityList[c].model = "models/dino/dino.json"; //"models/floor/floor.json";
 		//entityManager.entityList[c].directionLooking = 0;
@@ -105,7 +106,10 @@ void entityUpdate(Entity* self)
 		return;
 	}
 
-	self->position.z -= 0.3f;
+	if (!self->ignoreGravity)
+	{
+		self->position.z -= 0.3f;
+	}
 
 	if (self->isFrozen)
 	{
