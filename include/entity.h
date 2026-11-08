@@ -64,6 +64,7 @@ typedef enum role_s
 	ROLE_DEFAULT_PROJ,
 	ROLE_DEFAULT_BOMB,
 	ROLE_LAVA_BOMB,
+	ROLE_FREEZE_PROJ,
 
 	ROLE_TRASH,
 	ROLE_SUICIDER,
@@ -73,6 +74,12 @@ typedef enum role_s
 
 
 }Role;
+
+typedef enum status_s
+{
+	SE_FREEZE_TIME = 300,
+
+}StatusEffect;
 
 
 typedef struct Entity_S
@@ -117,7 +124,9 @@ typedef struct Entity_S
 
 	Uint8 isProj;
 
-	
+	Uint8 isFrozen;
+	Uint8 frozenTimer;
+	Uint8 maxFreeze;
 	
 
 }Entity;

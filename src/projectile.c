@@ -13,12 +13,15 @@ typedef struct
 	Uint16 timeToCount;
 
 	GFC_Vector3D currentDirection;
+
+	Uint8 canFreeze;
 }ProjData;
 
 void projectileThink(Entity* self);
 void projectileUpdate(Entity* self);
 void projectileFree(Entity* self);
-void projectileTouch(Entity* self);
+void projectileTouch(Entity* self, Entity* toucher);
+Uint8 projectileCanFreeze(Entity* self);
 
 
 Entity* projectileEntityNew(GFC_Vector3D position, Uint8 team, Uint16 timeToLive, Uint16 role)
@@ -39,6 +42,17 @@ Entity* projectileEntityNew(GFC_Vector3D position, Uint8 team, Uint16 timeToLive
 	{
 		slog("Failed to make proj data!");
 		return NULL;
+	}
+
+	switch (role)
+	{
+		case ROLE_FREEZE_PROJ:
+			data->canFreeze = 1;
+			self->damage = 0;
+			break;
+
+		default:
+			break;
 	}
 
 	self->position = position;
@@ -200,4 +214,23 @@ void projectileGiveMove(Entity* self, GFC_Vector3D direction)
 	}
 
 	data->currentDirection = direction;
+}
+
+Uint8 projectileCanFreeze(Entity* self)
+{
+	ProjData* data;
+
+	if (!self)
+	{
+		return 0;
+	}
+
+	data = (ProjData*)self->data;
+
+	if (!data)
+	{
+		return 0;
+	}
+
+	return data->canFreeze == 1;
 }

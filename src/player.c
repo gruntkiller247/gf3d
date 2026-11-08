@@ -55,6 +55,7 @@ Entity* playerEntityNew(GFC_Vector3D position)
 	self->role = ROLE_PLAYER;
 	self->velocityLastFrame = gfc_vector3d(0,0,0);
 
+	self->damage = 0;
 	self->maxHp = 3;
 	self->hp = self->maxHp;
 
@@ -240,13 +241,16 @@ void playerThink(Entity* self)
 	//Player Movement Update - Done in Think, yeah I know!
 	if ((move.x) || (move.y))
 	{
-		gfc_vector3d_normalize(&move);
+		if (!self->isFrozen)
+		{
+			gfc_vector3d_normalize(&move);
 
-		gfc_vector3d_rotate_about_z(&move, data->playerRotation.x);
+			gfc_vector3d_rotate_about_z(&move, data->playerRotation.x);
+			
+			//self->velocityLastFrame = self->velocityLastFrame;
+			self->velocity = move;
+		}
 
-		
-		//self->velocityLastFrame = self->velocityLastFrame;
-		self->velocity = move;
 		
 	}
 
@@ -312,6 +316,7 @@ void playerUpdate(Entity* self)
 		temp = getForward(self);
 		gfc_vector3d_add(temp,temp,self->position);
 		proj = projectileEntityNew(temp, self->team, TTL_PROJ_MELEE, ROLE_DEFAULT_PROJ);
+		
 	}
 	else if (gfc_input_key_pressed("g"))
 	{
@@ -320,6 +325,16 @@ void playerUpdate(Entity* self)
 	else if (gfc_input_key_pressed("b"))
 	{
 		proj = bombEntityNew(self->position, self->team, TTL_BOMB_LAVA, ROLE_LAVA_BOMB);
+	}
+	else if (gfc_input_key_pressed("e"))
+	{
+		//Freezing shot, no dmg!
+		proj = projectileEntityNew(self->position, self->team, TTL_PROJ_DEFAULT, ROLE_FREEZE_PROJ);
+
+		if (proj)
+		{
+			projectileGiveMove(proj, getForward(self));
+		}
 	}
 	else
 	{
@@ -380,6 +395,10 @@ void playerTouch(Entity* self, Entity* toucher)
 			//slog("Player touched by enemy!");
 			if (toucher->isProj)
 			{
+				if (projectileCanFreeze(toucher))
+				{
+					self->isFrozen = 1;
+				}
 				//slog("BEING TOUCHED BY ENEMY PROJ!");
 				toucher->_inUse = 0;
 				

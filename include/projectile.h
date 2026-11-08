@@ -24,4 +24,9 @@ void projectileTouch(Entity* self,Entity* toucher);
 */
 void projectileGiveMove(Entity* self, GFC_Vector3D direction);
 
+/*
+	Returns 1 if the projectile is allowed to freeze
+	All other cases, including NULL, returns 0
+*/
+Uint8 projectileCanFreeze(Entity* self);
 #endif

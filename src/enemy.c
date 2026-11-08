@@ -493,11 +493,15 @@ void enemyUpdate(Entity* self)
 	
 	if ((moveV.x) || (moveV.y))
 	{
-		gfc_vector3d_normalize(&moveV);
+		if (!self->isFrozen)
+		{
+			gfc_vector3d_normalize(&moveV);
 
-		gfc_vector3d_rotate_about_z(&moveV, data->enemyRotation.x);
+			gfc_vector3d_rotate_about_z(&moveV, data->enemyRotation.x);
 
-		self->velocity = moveV;
+			self->velocity = moveV;
+		}
+
 	}
 
 	if (moveV.z)
@@ -596,9 +600,14 @@ void enemyTouch(Entity* self, Entity* toucher)
 		{
 			//slog("ENEMY TOUCHED by player!");
 
-			//self->hp--;
+			self->hp-= toucher->damage;
+
 			if (toucher->isProj)
 			{
+				if (projectileCanFreeze(toucher))
+				{
+					self->isFrozen = 1;
+				}
 				//slog("ENEMY TOUCHED PLAYER PROJ!");
 				toucher->_inUse = 0;
 				

@@ -70,6 +70,10 @@ Entity* entityNew()
 
 		entityManager.entityList[c].scale = gfc_vector3d(1,1,1);
 		entityManager.entityList[c].color = GFC_COLOR_WHITE;
+
+		entityManager.entityList[c].maxFreeze = SE_FREEZE_TIME;
+		entityManager.entityList[c].damage = 1;
+
 		//entityManager.entityList[c].model = "models/dino/dino.json"; //"models/floor/floor.json";
 		//entityManager.entityList[c].directionLooking = 0;
 
@@ -101,10 +105,24 @@ void entityUpdate(Entity* self)
 		return;
 	}
 
+	if (self->isFrozen)
+	{
+		//slog("I AM FUCKING COLD!\n%i\n%i",self->frozenTimer,self->maxFreeze);
+		self->frozenTimer++;
+	}
+
+	if (self->frozenTimer >= self->maxFreeze)
+	{
+		//slog("I AM WARM AGAIN!");
+		self->frozenTimer = 0;
+		self->isFrozen = 0;
+	}
+
 	if (self->update)
 	{
 		self->update(self);
 	}
+	
 
 	levelPosCheck(level, self);
 
