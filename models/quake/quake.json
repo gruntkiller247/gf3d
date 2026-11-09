@@ -1,7 +1,6 @@
 {
-  "model": 
-  {
+  "model": {
     "obj": "models/quake/quake.obj",
-    "texture": "models/quake/Quake.png"
-   }
+    "texture": "models/quake/quake.jpg"
+  }
 }

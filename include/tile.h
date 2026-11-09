@@ -13,6 +13,8 @@ typedef enum
 	TT_FREEZE,
 	TT_ENEMY_SPAWNER,
 	TT_GRAVITY,
+	TT_QUAKE,
+
 
 
 

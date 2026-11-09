@@ -154,6 +154,19 @@ Entity* enemyEntityNew(GFC_Vector3D pos, Uint8 role)
 			data->moveMax = 10;
 			data->lookAt = getPlayer()->position;
 			break;
+
+		case ROLE_QUAKE_ENEMY:
+			self->model = model_load("models/quake/quake.json");
+			self->maxHp = 1;
+			self->hp = self->maxHp;
+			self->damage = 0;
+			
+			Uint8 temp = 5;
+			self->scale.x = temp;
+			self->scale.y = temp;
+			self->scale.z = temp;
+
+			break;
 		
 		default:
 
@@ -313,6 +326,9 @@ void enemyThink(Entity* self)
 				}
 			}
 
+		case ROLE_QUAKE_ENEMY:
+
+			break;
 
 
 		case ROLE_SUICIDER:
@@ -328,6 +344,8 @@ void enemyThink(Entity* self)
 		case ROLE_DEAD:
 			self->_inUse = 0;
 			break;
+
+
 
 		default:
 
@@ -478,12 +496,15 @@ void enemyUpdate(Entity* self)
 					slog("I am some other state!");
 					break;
 			}
-			
-			break;
 
 
 
 			break;
+
+		case ROLE_QUAKE_ENEMY:
+
+			break;
+
 		default:
 			slog("NO MOVEMENT ROLE CHECK!");
 			break;

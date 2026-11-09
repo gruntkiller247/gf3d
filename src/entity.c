@@ -7,7 +7,7 @@
 #include "gfc_matrix.h"
 #include "entity.h"
 #include "model.h"
-
+#include "enemy.h"
 
 typedef struct
 {
@@ -76,6 +76,7 @@ Entity* entityNew()
 		entityManager.entityList[c].ignoreGravity = 0;
 		entityManager.entityList[c].reverseGravity = 0;
 		entityManager.entityList[c].reverseGravityMax = SE_GRAVITY_TIME;
+		entityManager.entityList[c].quake = 0;
 
 		//entityManager.entityList[c].model = "models/dino/dino.json"; //"models/floor/floor.json";
 		//entityManager.entityList[c].directionLooking = 0;
@@ -92,6 +93,7 @@ void entityUpdate(Entity* self)
 {
 	Uint8 bounds;
 	Level* level;
+	Entity* quakeCube;
 
 	if (!self)
 	{
@@ -106,6 +108,15 @@ void entityUpdate(Entity* self)
 	{
 		slog("Failed to get the level in Entity Update!");
 		return;
+	}
+
+	if (self->quake == 1)
+	{
+		//Spawn the Quake cube in fron of the enemy's POV!
+		//slog("QUAKE!");
+		
+		quakeCube = enemyEntityNew(self->position, ROLE_QUAKE_ENEMY);
+		self->quake = 0;
 	}
 
 	if (!self->ignoreGravity)

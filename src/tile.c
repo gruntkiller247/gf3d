@@ -9,6 +9,7 @@ typedef struct
 	Uint8 canFreeze;
 	Uint8 canSpawn;
 	Uint8 canGravity;
+	Uint8 canQuake;
 
 	Uint16 shotTimer;
 	Uint16 shotMax;
@@ -52,6 +53,7 @@ Entity* tileEntityNew(Uint8 role, GFC_Vector3D pos)
 	data->canSpawn = 0;
 	data->spawned = 0;
 	data->canGravity = 0;
+	data->canQuake = 0;
 	
 
 	gfc_vector3d_copy(tile->position,pos);
@@ -102,7 +104,7 @@ Entity* tileEntityNew(Uint8 role, GFC_Vector3D pos)
 
 		case TT_GRAVITY:
 			tile->model = model_load("models/floor/floor.json");
-			tile->color = GFC_COLOR_LIGHTRED;
+			tile->color = GFC_COLOR_LIGHTMAGENTA;
 			rdNum = (rand() % (2000 - 1000 + 1)) + 1000;
 
 			data->canGravity = 1;
@@ -111,6 +113,21 @@ Entity* tileEntityNew(Uint8 role, GFC_Vector3D pos)
 			//slog("RDNUM: %i", rdNum);
 			tile->team = TEAM_TRAP;
 
+
+			break;
+
+		case TT_QUAKE:
+			tile->model = model_load("models/floor/floor.json");
+			tile->color = GFC_COLOR_DARKGREEN;
+			//rdNum = (rand() % (2000 - 1000 + 1)) + 1000;
+			rdNum = (rand() % (20 - 10 + 1)) + 10;
+
+			data->canQuake = 1;
+			data->spawned = 0;
+
+			data->shotMax = rdNum;
+			//slog("RDNUM: %i", rdNum);
+			tile->team = TEAM_TRAP;
 
 			break;
 
@@ -179,7 +196,6 @@ void tileUpdate(Entity* self)
 
 			case SE_SPAWN:
 				
-
 				if (data->spawned == 1)
 				{
 					break;
@@ -214,6 +230,33 @@ void tileUpdate(Entity* self)
 					temp.z = self->position.z + self->model->mesh->bounds.w;
 
 					proj = projectileEntityNew(self->position, self->team, TTL_PROJ_MELEE, ROLE_GRAVITY_PROJ);
+				}
+
+
+				break;
+			
+			case SE_QUAKE:
+
+				if (data->spawned == 1)
+				{
+					break;
+				}
+
+				data->shotTimer++;
+
+				if (data->shotTimer >= data->shotMax)
+				{
+					//slog("SHOOTING ICE SPIKE!\nShotMax: %i",data->shotMax);
+					data->shotTimer = 0;
+
+					temp.x = self->position.x;
+					temp.y = self->position.y;
+					temp.z = self->position.z + self->model->mesh->bounds.w;
+
+					proj = enemyEntityNew(temp, ROLE_QUAKE_ENEMY);
+					data->spawned = 1;
+
+					//proj = projectileEntityNew(self->position, self->team, TTL_PROJ_MELEE, ROLE_QUAKE_PROJ);
 				}
 
 				break;
@@ -268,6 +311,11 @@ Uint8 tileCanStatus(Entity* tile)
 	if (data->canGravity == 1)
 	{
 		return SE_GRAVITY;
+	}
+
+	if (data->canQuake == 1)
+	{
+		return SE_QUAKE;
 	}
 
 	return SE_NONE;

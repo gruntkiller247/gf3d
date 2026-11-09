@@ -431,6 +431,10 @@ void playerTouch(Entity* self, Entity* toucher)
 
 						self->reverseGravity = 1;
 
+					case SE_QUAKE:
+
+						self->quake = 1;
+
 					default:
 
 						break;
@@ -439,6 +443,12 @@ void playerTouch(Entity* self, Entity* toucher)
 				toucher->_inUse = 0;
 				return;
 				
+			}
+
+			if (toucher->role == ROLE_QUAKE_ENEMY)
+			{
+				toucher->_inUse = 0;
+				return;
 			}
 
 			

@@ -16,6 +16,7 @@ typedef struct
 
 	Uint8 canFreeze;
 	Uint8 canGravity;
+	Uint8 canQuake;
 }ProjData;
 
 void projectileThink(Entity* self);
@@ -47,6 +48,9 @@ Entity* projectileEntityNew(GFC_Vector3D position, Uint8 team, Uint16 timeToLive
 
 	data->canGravity = 0;
 	data->canFreeze = 0;
+	data->canQuake = 0;
+
+	self->model = model_load("models/Cube/Cube.json");
 
 	switch (role)
 	{
@@ -63,6 +67,13 @@ Entity* projectileEntityNew(GFC_Vector3D position, Uint8 team, Uint16 timeToLive
 
 			break;
 
+		case ROLE_QUAKE_PROJ:
+			data->canQuake = 1;
+			self->damage = 0;
+			self->color = GFC_COLOR_DARKGREEN;
+			//self->model = model_load("models/quake/quake.json");
+
+			break;
 		default:
 			break;
 	}
@@ -90,7 +101,7 @@ Entity* projectileEntityNew(GFC_Vector3D position, Uint8 team, Uint16 timeToLive
 	self->touch = projectileTouch;
 	self->free = projectileFree;
 
-	self->model = model_load("models/Cube/Cube.json");
+	
 
 	self->bounds = self->model->mesh->bounds;
 	
@@ -262,14 +273,19 @@ Uint8 projectileCanStatus(Entity* self)
 		return SE_NONE;
 	}
 
-	if (data->canFreeze)
+	if (data->canFreeze == 1)
 	{
 		return SE_FREEZE;
 	}
 
-	if (data->canGravity)
+	if (data->canGravity == 1)
 	{
 		return SE_GRAVITY;
+	}
+
+	if (data->canQuake == 1)
+	{
+		return SE_QUAKE;
 	}
 
 	return SE_NONE;
