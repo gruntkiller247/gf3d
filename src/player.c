@@ -124,6 +124,7 @@ void playerThink(Entity* self)
 	PlayerData* data;
 	Entity* camera;
 	CameraData* cData;
+	Uint8 direction;
 
 	if (!self || !self->data)
 	{
@@ -244,6 +245,84 @@ void playerThink(Entity* self)
 	{
 		move.z = 0;
 	}
+
+	//Player only state!
+	if (self->flinged == 1)
+	{
+		direction = rand() % 8;
+		slog("Flinging player!");
+
+		//Fling the player?
+		switch (direction)
+		{
+		case(D_NORTH):
+
+			//slog("Moving North!");
+			move.x += 1;
+
+			break;
+
+		case(D_NORTHEAST):
+			move.x += 1;
+			move.y += 1;
+
+			//slog("Moving North East!");
+			break;
+
+		case(D_EAST):
+			move.y += 1;
+
+			//slog("Moving East!");
+			break;
+
+		case(D_SOUTHEAST):
+			move.x += -1;
+			move.y += 1;
+
+			//slog("Moving South East!");
+			break;
+
+		case(D_SOUTH):
+			move.x += -1;
+			//slog("Moving South");
+			break;
+
+		case(D_SOUTHWEST):
+			move.x += -1;
+			move.y += -1;
+
+			//slog("Moving South West!");
+			break;
+
+		case(D_WEST):
+			move.y += -1;
+
+			//slog("Moving West!");
+			break;
+
+		case(D_NORTHWEST):
+			move.x += 1;
+			move.y += -1;
+
+			//slog("Moving North West!");
+			break;
+
+		default:
+
+			slog("No real direction given for monster movement!");
+			return;
+		}
+
+		move.x *= SE_FLING_SPEED;
+		move.y *= SE_FLING_SPEED;
+		move.z += 1.0 / SE_FLING_SPEED;
+
+		self->velocity.x += move.x;
+		self->velocity.y += move.y;
+		self->flinged = 0;
+
+	}
+
 
 	if (move.z)
 	{
@@ -434,6 +513,10 @@ void playerTouch(Entity* self, Entity* toucher)
 					case SE_QUAKE:
 
 						self->quake = 1;
+
+					case SE_FLING:
+						self->flinged = 1;
+						slog("Touched fling!");
 
 					default:
 

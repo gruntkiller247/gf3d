@@ -14,7 +14,7 @@ typedef enum
 	TT_ENEMY_SPAWNER,
 	TT_GRAVITY,
 	TT_QUAKE,
-
+	TT_FLING,
 
 
 

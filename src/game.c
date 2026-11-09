@@ -1,4 +1,5 @@
 #include <SDL.h>            
+#include <time.h>
 
 #include "simple_json.h"
 #include "simple_logger.h"
@@ -55,6 +56,7 @@ int main(int argc,char *argv[])
     Level* level;
     Entity* player;
 
+    srand(time(NULL));
 
     //initializtion    
     parse_arguments(argc,argv);

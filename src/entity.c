@@ -77,6 +77,7 @@ Entity* entityNew()
 		entityManager.entityList[c].reverseGravity = 0;
 		entityManager.entityList[c].reverseGravityMax = SE_GRAVITY_TIME;
 		entityManager.entityList[c].quake = 0;
+		entityManager.entityList[c].flinged = 0;
 
 		//entityManager.entityList[c].model = "models/dino/dino.json"; //"models/floor/floor.json";
 		//entityManager.entityList[c].directionLooking = 0;
@@ -94,6 +95,8 @@ void entityUpdate(Entity* self)
 	Uint8 bounds;
 	Level* level;
 	Entity* quakeCube;
+	GFC_Vector3D temp = { 0 };
+	Uint8 direction;
 
 	if (!self)
 	{
@@ -118,6 +121,7 @@ void entityUpdate(Entity* self)
 		quakeCube = enemyEntityNew(self->position, ROLE_QUAKE_ENEMY);
 		self->quake = 0;
 	}
+
 
 	if (!self->ignoreGravity)
 	{

@@ -10,11 +10,13 @@ typedef struct
 	Uint8 canSpawn;
 	Uint8 canGravity;
 	Uint8 canQuake;
+	Uint8 canFling;
 
 	Uint16 shotTimer;
 	Uint16 shotMax;
 
 	Uint8 spawned;
+	
 }TileData;
 
 
@@ -54,6 +56,7 @@ Entity* tileEntityNew(Uint8 role, GFC_Vector3D pos)
 	data->spawned = 0;
 	data->canGravity = 0;
 	data->canQuake = 0;
+	data->canFling = 0;
 	
 
 	gfc_vector3d_copy(tile->position,pos);
@@ -119,8 +122,8 @@ Entity* tileEntityNew(Uint8 role, GFC_Vector3D pos)
 		case TT_QUAKE:
 			tile->model = model_load("models/floor/floor.json");
 			tile->color = GFC_COLOR_DARKGREEN;
-			//rdNum = (rand() % (2000 - 1000 + 1)) + 1000;
-			rdNum = (rand() % (20 - 10 + 1)) + 10;
+			rdNum = (rand() % (2000 - 1000 + 1)) + 1000;
+			//rdNum = (rand() % (20 - 10 + 1)) + 10;
 
 			data->canQuake = 1;
 			data->spawned = 0;
@@ -131,6 +134,19 @@ Entity* tileEntityNew(Uint8 role, GFC_Vector3D pos)
 
 			break;
 
+		case TT_FLING:
+			tile->model = model_load("models/floor/floor.json");
+			tile->color = GFC_COLOR_LIGHTYELLOW;
+			rdNum = (rand() % (2000 - 1000 + 1)) + 1000;
+			//rdNum = (rand() % (20 - 10 + 1)) + 10;
+
+			data->canFling = 1;
+
+			data->shotMax = rdNum;
+			//slog("RDNUM: %i", rdNum);
+			tile->team = TEAM_TRAP;
+
+			break;
 		default:
 			slog("No Tile role type!");
 
@@ -164,6 +180,7 @@ void tileUpdate(Entity* self)
 	Entity* proj;
 	Uint8 status = 0;
 	GFC_Vector3D temp = { 0 };
+	Uint8 direction;
 
 	if (!self)
 	{
@@ -261,6 +278,21 @@ void tileUpdate(Entity* self)
 
 				break;
 
+			case SE_FLING:
+				data->shotTimer++;
+
+				if (data->shotTimer >= data->shotMax)
+				{
+					data->shotTimer = 0;
+					temp.x = self->position.x;
+					temp.y = self->position.y;
+					temp.z = self->position.z + self->model->mesh->bounds.w;
+
+					proj = projectileEntityNew(self->position, self->team, TTL_PROJ_DEFAULT, ROLE_FLING_PROJ);
+				}
+				
+				break;
+
 			default:
 				slog("NO TILE STATUS!");
 		}
@@ -316,6 +348,11 @@ Uint8 tileCanStatus(Entity* tile)
 	if (data->canQuake == 1)
 	{
 		return SE_QUAKE;
+	}
+
+	if (data->canFling == 1)
+	{
+		return SE_FLING;
 	}
 
 	return SE_NONE;
