@@ -115,11 +115,16 @@ void entityUpdate(Entity* self)
 
 	if (self->quake == 1)
 	{
-		//Spawn the Quake cube in fron of the enemy's POV!
-		//slog("QUAKE!");
-		
-		quakeCube = enemyEntityNew(self->position, ROLE_QUAKE_ENEMY);
-		self->quake = 0;
+		if (self->role == ROLE_PLAYER)
+		{
+			//Spawn the Quake cube in fron of the enemy's POV!
+			//slog("QUAKE!");
+			self->hp++;
+
+			//quakeCube = enemyEntityNew(self->position, ROLE_QUAKE_ENEMY);
+			//self->quake = 0;
+		}
+
 	}
 
 

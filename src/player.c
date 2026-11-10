@@ -518,7 +518,7 @@ void playerTouch(Entity* self, Entity* toucher)
 						self->reverseGravity = 1;
 
 					case SE_QUAKE:
-
+						//slog("QUAKE2");
 						self->quake = 1;
 
 					case SE_FLING:
@@ -537,6 +537,7 @@ void playerTouch(Entity* self, Entity* toucher)
 
 			if (toucher->role == ROLE_QUAKE_ENEMY)
 			{
+				self->quake = 1;
 				toucher->_inUse = 0;
 				return;
 			}

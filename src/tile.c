@@ -122,8 +122,8 @@ Entity* tileEntityNew(Uint8 role, GFC_Vector3D pos)
 		case TT_QUAKE:
 			tile->model = model_load("models/floor/floor.json");
 			tile->color = GFC_COLOR_DARKGREEN;
-			rdNum = (rand() % (2000 - 1000 + 1)) + 1000;
-			//rdNum = (rand() % (20 - 10 + 1)) + 10;
+			//rdNum = (rand() % (2000 - 1000 + 1)) + 1000;
+			rdNum = (rand() % (20 - 10 + 1)) + 10;
 
 			data->canQuake = 1;
 			data->spawned = 0;
