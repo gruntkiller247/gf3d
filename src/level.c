@@ -338,7 +338,7 @@ Level* levelLoadTest()
 	for (c = 0; c < sizeMax; c++)
 	{
 		rdNum = rand() % (10 - 1 + 1) + 1;
-		rdNum = 5;
+		rdNum = 4;
 
 		if (rdNum == 1)
 		{

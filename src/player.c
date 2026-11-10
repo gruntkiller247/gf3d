@@ -442,6 +442,13 @@ void playerUpdate(Entity* self)
 	{
 
 	}
+
+	/*Add keys to spawn each enemy type!
+	else if ()
+	{
+
+	}
+	*/
 	
 }
 

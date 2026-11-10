@@ -56,6 +56,10 @@ int main(int argc,char *argv[])
     Level* level;
     Entity* player;
 
+    Uint8 paused;
+
+    paused = 0;
+
     srand(time(NULL));
 
     //initializtion    
@@ -131,13 +135,34 @@ int main(int argc,char *argv[])
         
         //slog("Mouse X: %f\nMouse Y: %f", gf2d_mouse_get_position().x, gf2d_mouse_get_position().y);
         
-        
-        entityThinkAll();
-        entityFreeAll();
-        entityUpdateAll();
-        entityTouchAll();
-        entityDrawAll();
-        //levelDraw(level);
+        switch (paused)
+        {
+            case 1:
+                entityDrawAll();
+                break;
+            default:
+                entityThinkAll();
+                entityFreeAll();
+                entityUpdateAll();
+                entityTouchAll();
+                entityDrawAll();
+                //levelDraw(level);
+
+                break;
+        }
+
+        if (gfc_input_key_pressed("p"))
+        {
+            if (paused == 1)
+            {
+                paused = 0;
+            }
+            else
+            {
+                paused = 1;
+            }
+        }
+
 
        
         //2D draws
