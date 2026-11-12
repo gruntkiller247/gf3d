@@ -107,7 +107,7 @@ Entity* tileEntityNew(Uint8 role, GFC_Vector3D pos)
 
 		case TT_GRAVITY:
 			tile->model = model_load("models/floor/floor.json");
-			tile->color = GFC_COLOR_LIGHTMAGENTA;
+			tile->color = GFC_COLOR_MAGENTA;
 			rdNum = (rand() % (2000 - 1000 + 1)) + 1000;
 
 			data->canGravity = 1;
